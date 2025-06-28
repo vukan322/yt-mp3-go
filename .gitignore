@@ -1,0 +1,19 @@
+# Compiled Go files
+*.exe
+*.exe~
+*.dll
+*.so
+*.a
+main
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+
+# Environment variables
+.env
+
+# Ignore downloaded files, but keep the directory in the repo
+downloads/*
+!downloads/.gitkeep

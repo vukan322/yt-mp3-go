@@ -1,0 +1,65 @@
+{{define "content"}}
+<form id="download-form" action="{{.BasePath}}/download" method="POST" class="download-form">
+    <div class="input-group">
+        <input type="url" name="url" id="url-input" placeholder="{{Localize "urlInputPlaceholder"}}" required>
+        <button type="button" id="paste-button" title="{{Localize "pasteButtonTitle"}}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        </button>
+    </div>
+    <button type="submit" id="submit-button" title="{{Localize "downloadButtonTitle"}}">{{Localize "downloadButton"}}</button>
+</form>
+
+<div id="status-area" class="status-card" style="display: none; margin-top: 2rem;"
+    data-submitting-text="{{Localize "statusSubmitting"}}"
+    data-processing-text="{{Localize "statusProcessing"}}"
+    data-ready-text="{{Localize "statusReady"}}"
+    data-failed-text="{{Localize "statusFailed"}}"
+    data-connection-lost-text="{{Localize "statusConnectionLost"}}"
+    data-download-file-text="{{Localize "downloadFile"}}"
+    data-file-size-label="{{Localize "fileSizeLabel"}}">
+
+    <button id="reset-button" title="{{Localize "resetButtonTitle"}}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+
+    <img id="thumbnail" src="" alt="Video thumbnail" style="display: none;" />
+    <h2 id="video-title"></h2>
+    <div id="spinner" class="spinner"></div>
+    <p id="status-text"></p>
+    <a href="#" id="download-link"></a>
+
+    <p id="file-size-text"></p>
+    <p id="error-message"></p>
+</div>
+
+<div class="features-grid">
+    <div class="feature-card">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3M6 7v10M10 4v16M14 7v10M18 10v3"></path></svg>
+        <div>
+            <h3>{{Localize "featureOneTitle"}}</h3>
+            <p>{{Localize "featureOneDesc"}}</p>
+        </div>
+    </div>
+    <div class="feature-card">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <div>
+            <h3>{{Localize "featureTwoTitle"}}</h3>
+            <p>{{Localize "featureTwoDesc"}}</p>
+        </div>
+    </div>
+    <div class="feature-card">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <div>
+            <h3>{{Localize "featureThreeTitle"}}</h3>
+            <p>{{Localize "featureThreeDesc"}}</p>
+        </div>
+    </div>
+    <div class="feature-card">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+        <div>
+            <h3>{{Localize "featureFourTitle"}}</h3>
+            <p>{{Localize "featureFourDesc"}}</p>
+        </div>
+    </div>
+</div>
+{{end}}

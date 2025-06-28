@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="{{.Lang}}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{Localize "appTitle"}}</title>
+    <link rel="icon" href="{{.BasePath}}/static/L-logo.webp" type="image/webp">
+    <link rel="stylesheet" href="{{.BasePath}}/static/css/style.css">
+</head>
+<body class="dark-theme" data-base-path="{{.BasePath}}">
+    <div class="controls">
+        <div class="lang-switcher">
+            <a href="{{.BasePath}}/?lang=en" {{if eq .Lang "en"}}class="active"{{end}}>EN</a>
+            <a href="{{.BasePath}}/?lang=sr" {{if eq .Lang "sr"}}class="active"{{end}}>SR</a>
+        </div>
+        <div class="theme-switcher">
+            <button id="theme-switcher" title="Toggle theme">
+                <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo-title">
+                <svg class="yt-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.582,6.186 c-0.218-0.812-0.883-1.478-1.695-1.696C18.252,4,12,4,12,4S5.748,4,4.113,4.49C3.301,4.708,2.636,5.374,2.418,6.186 C2,7.82,2,12,2,12s0,4.18,0.418,5.814c0.218,0.812,0.883,1.478,1.695,1.696C5.748,20,12,20,12,20s6.252,0,7.887-0.49 c0.812-0.218,1.477-0.884,1.695-1.696C22,16.18,22,12,22,12S22,7.82,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"></path></svg>
+                <h1>{{Localize "appTitle"}}</h1>
+            </div>
+            <p>{{Localize "appDescription"}}</p>
+        </header>
+
+        <main>
+            {{template "content" .}}
+        </main>
+    </div>
+    
+    <footer>
+        © 2025 <a href="https://lukavukanovic.xyz" target="_blank" rel="noopener noreferrer">Luka Vukanović</a>. {{Localize "footerText"}}
+    </footer>
+
+    <script src="{{.BasePath}}/static/js/main.js" type="module"></script>
+</body>
+</html>
