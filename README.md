@@ -22,7 +22,6 @@ This project was brought to life with these modern technologies:
 |:------------------------------|:------------------------------------------------------------------------------------------------------|
 | **Go (Golang)**               | The core language for the backend server, chosen for its performance and concurrency features.        |
 | **Vanilla JavaScript (ES6+)** | Used for all client-side logic, including AJAX, DOM manipulation, and handling Server-Sent Events.    |
-| **HTML5 & CSS3**              | For the structure and styling of the user interface, utilizing modern features like Flexbox and Grid. |
 | **`yt-dlp`**                  | A powerful command-line tool used by the backend to handle the downloading from YouTube.              |
 | **`ffmpeg`**                  | An essential external program used by `yt-dlp` to perform the audio conversion to MP3.                |
 | **`go-i18n/v2`**              | The Go library used to manage the application's internationalization and translations.                |
