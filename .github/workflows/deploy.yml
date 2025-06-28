@@ -51,7 +51,9 @@ jobs:
             APP_PATH="/var/www/yt-downloader"
             
             echo "Clearing old app files..."
-            rm -rf $APP_PATH/*
+            rm -f $APP_PATH/yt-downloader
+            rm -rf $APP_PATH/web
+            rm -rf $APP_PATH/locales
             
             echo "Moving new files..."
             mv ~/yt_downloader_latest/* $APP_PATH/
