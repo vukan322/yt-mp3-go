@@ -1,0 +1,65 @@
+name: Build and Deploy Go App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - name: Build Go Binary
+        run: go build -ldflags="-s -w" -o yt-downloader ./cmd/server
+
+      - name: Create Release Package
+        run: |
+          mkdir release
+          mv yt-downloader release/
+          cp -r web release/
+          cp -r locales release/
+          mkdir -p release/downloads
+          touch release/downloads/.gitkeep
+
+      - name: Copy files to server via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "release/"
+          target: "~/yt_downloader_latest"
+          strip_components: 1
+
+      - name: Deploy new build to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            APP_PATH="/var/www/yt-downloader"
+            
+            echo "Clearing old app files..."
+            rm -rf $APP_PATH/*
+            
+            echo "Moving new files..."
+            mv ~/yt_downloader_latest/* $APP_PATH/
+            
+            echo "Restarting service..."
+            sudo systemctl restart yt-downloader.service
+            
+            echo "Cleaning up..."
+            rm -rf ~/yt_downloader_latest
+            
+            echo "Deployment successful!"
