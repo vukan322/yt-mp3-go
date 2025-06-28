@@ -23,7 +23,7 @@ type Metadata struct {
 type Downloader struct{}
 
 func (d *Downloader) GetMetadata(url string) (*Metadata, error) {
-	cmd := exec.Command("yt-dlp", "--no-playlist", "--dump-single-json", url)
+	cmd := exec.Command("yt-dlp", "--cookies", "cookies.txt", "--no-playlist", "--dump-single-json", url)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return nil, fmt.Errorf("metadata command failed: %s", string(output))
@@ -48,6 +48,7 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, url string) {
 	}
 
 	cmd := exec.Command("yt-dlp",
+		"--cookies", "cookies.txt",
 		"--no-playlist", "--extract-audio", "--audio-format", "mp3", "--audio-quality", "0",
 		"-o", "%(title)s.%(ext)s",
 		"-P", outputDir,
