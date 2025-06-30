@@ -30,14 +30,16 @@ func (d *Downloader) GetMetadata(url string) (*Metadata, error) {
 		return nil, fmt.Errorf("metadata command failed: %s", string(output))
 	}
 
-	trimmedOutput := bytes.TrimSpace(output)
-	if !bytes.HasPrefix(trimmedOutput, []byte("{")) {
-		return nil, fmt.Errorf("yt-dlp returned a non-JSON response: %s", string(output))
+	jsonStartIndex := bytes.Index(output, []byte("{"))
+	if jsonStartIndex == -1 {
+		return nil, fmt.Errorf("yt-dlp returned no JSON output: %s", string(output))
 	}
 
+	jsonOutput := output[jsonStartIndex:]
+
 	var meta Metadata
-	if err := json.Unmarshal(output, &meta); err != nil {
-		return nil, fmt.Errorf("failed to parse metadata json: %w. Raw output: %s", err, string(output))
+	if err := json.Unmarshal(jsonOutput, &meta); err != nil {
+		return nil, fmt.Errorf("yt-dlp returned a non-JSON response: %s", string(output))
 	}
 	return &meta, nil
 }
