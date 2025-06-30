@@ -2,6 +2,7 @@ package downloader
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/vukan322/yt-mp3-go/internal/jobs"
@@ -28,9 +29,15 @@ func (d *Downloader) GetMetadata(url string) (*Metadata, error) {
 	if err != nil {
 		return nil, fmt.Errorf("metadata command failed: %s", string(output))
 	}
+
+	trimmedOutput := bytes.TrimSpace(output)
+	if !bytes.HasPrefix(trimmedOutput, []byte("{")) {
+		return nil, fmt.Errorf("yt-dlp returned a non-JSON response: %s", string(output))
+	}
+
 	var meta Metadata
 	if err := json.Unmarshal(output, &meta); err != nil {
-		return nil, fmt.Errorf("failed to parse metadata json: %w", err)
+		return nil, fmt.Errorf("failed to parse metadata json: %w. Raw output: %s", err, string(output))
 	}
 	return &meta, nil
 }
