@@ -21,5 +21,6 @@
   "featureThreeDesc": { "translation": "Vaše preuzimanje se obrađuje u pozadini kako biste mogli da nastavite sa pretraživanjem." },
   "featureFourTitle": { "translation": "Bez reklama, bez naknada" },
   "featureFourDesc": { "translation": "Usluga je potpuno besplatna za korišćenje bez nametljivih reklama ili skrivenih troškova." },
-  "footerText": { "translation": "Sva prava zadržana." }
+  "footerText": { "translation": "Sva prava zadržana." },
+  "versionLabel": { "translation": "Verzija:" }
 }

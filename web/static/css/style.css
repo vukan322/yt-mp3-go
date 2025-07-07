@@ -397,14 +397,23 @@ body.dark-theme .feature-card p {
 }
 
 footer {
-    text-align: center;
-    margin-top: 3rem;
-    padding: 2rem 1rem;
+    width: 100%;
+    max-width: 600px;
+    margin: 4rem auto 0;
+    padding: 2rem 0;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
     font-size: 0.9rem;
     color: var(--muted-light);
+    transition: all 0.3s;
 }
 
 body.dark-theme footer {
+    border-top-color: var(--border-dark);
     color: var(--muted-dark);
 }
 
@@ -422,6 +431,10 @@ body.dark-theme footer a {
 footer a:hover {
     color: var(--primary-color);
     text-decoration: underline;
+}
+
+.footer-version {
+    opacity: 0.8;
 }
 
 @media (max-width: 640px) {
@@ -444,6 +457,12 @@ footer a:hover {
     }
     .features-grid {
         grid-template-columns: 1fr;
+    }
+    footer {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 0.5rem;
     }
 }
 

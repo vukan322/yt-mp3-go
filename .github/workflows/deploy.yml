@@ -20,7 +20,10 @@ jobs:
           cache: true
 
       - name: Build Go Binary
-        run: go build -ldflags="-s -w" -o yt-downloader ./cmd/server
+        run: |
+          VERSION="1.0.${{ github.run_number }}"
+          echo "Building version $VERSION"
+          go build -ldflags="-s -w -X main.version=$VERSION" -o yt-downloader ./cmd/server
 
       - name: Create Release Package
         run: |

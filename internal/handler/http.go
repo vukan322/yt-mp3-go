@@ -3,10 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/vukan322/yt-mp3-go/internal/downloader"
-	"github.com/vukan322/yt-mp3-go/internal/jobs"
 	"html/template"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -14,6 +12,8 @@ import (
 	"time"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/vukan322/yt-mp3-go/internal/downloader"
+	"github.com/vukan322/yt-mp3-go/internal/jobs"
 	"golang.org/x/text/language"
 )
 
@@ -23,6 +23,7 @@ type AppHandler struct {
 	JobStore   *jobs.JobStore
 	BasePath   string
 	Templates  *template.Template
+	Version    string
 }
 
 func (h *AppHandler) Routes() *http.ServeMux {
@@ -52,13 +53,14 @@ func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
 
 	meta, err := h.Downloader.GetMetadata(url)
 	if err != nil {
+		slog.Error("failed to get video metadata", "url", url, "error", err)
 		http.Error(w, fmt.Sprintf("Failed to get video metadata: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	job := h.JobStore.Create(url)
 	go h.Downloader.Download(h.JobStore, job.ID, url)
-	log.Printf("Created job %s for URL: %s", job.ID, url)
+	slog.Info("created job", "jobID", job.ID, "url", url)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]any{
@@ -97,6 +99,7 @@ func (h *AppHandler) HandleStatusEvents(w http.ResponseWriter, r *http.Request) 
 
 	flusher, ok := w.(http.Flusher)
 	if !ok {
+		slog.Error("streaming unsupported")
 		http.Error(w, "Streaming unsupported!", http.StatusInternalServerError)
 		return
 	}
@@ -132,8 +135,8 @@ func (h *AppHandler) HandleIndex(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, err := h.Templates.Clone()
 	if err != nil {
+		slog.Error("failed to clone templates", "error", err)
 		http.Error(w, "Failed to clone templates", http.StatusInternalServerError)
-		log.Println("Template cloning error:", err)
 		return
 	}
 
@@ -147,11 +150,12 @@ func (h *AppHandler) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	data := map[string]any{
 		"Lang":     lang,
 		"BasePath": h.BasePath,
+		"Version":  h.Version,
 	}
 
 	err = tmpl.ExecuteTemplate(w, "layout.gohtml", data)
 	if err != nil {
+		slog.Error("failed to execute template", "error", err)
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
-		log.Println("Template execution error:", err)
 	}
 }

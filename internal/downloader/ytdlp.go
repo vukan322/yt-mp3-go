@@ -5,15 +5,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/vukan322/yt-mp3-go/internal/jobs"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/vukan322/yt-mp3-go/internal/jobs"
 )
+
+const cookiesFile = "cookies.txt"
 
 type Metadata struct {
 	ID        string `json:"id"`
@@ -23,8 +26,19 @@ type Metadata struct {
 
 type Downloader struct{}
 
+func commandArgs(baseArgs []string) []string {
+	if _, err := os.Stat(cookiesFile); err == nil {
+		slog.Debug("cookies.txt found, using cookies for request")
+		return append([]string{"--cookies", cookiesFile}, baseArgs...)
+	}
+	slog.Debug("cookies.txt not found, proceeding without cookies")
+	return baseArgs
+}
+
 func (d *Downloader) GetMetadata(url string) (*Metadata, error) {
-	cmd := exec.Command("yt-dlp", "--cookies", "cookies.txt", "--no-playlist", "--dump-single-json", url)
+	args := commandArgs([]string{"--no-playlist", "--dump-single-json", url})
+	cmd := exec.Command("yt-dlp", args...)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return nil, fmt.Errorf("metadata command failed: %s", string(output))
@@ -45,30 +59,30 @@ func (d *Downloader) GetMetadata(url string) (*Metadata, error) {
 }
 
 func (d *Downloader) Download(store *jobs.JobStore, jobID, url string) {
-	log.Printf("[JOB %s] Starting download...", jobID)
+	slog.Info("starting download", "jobID", jobID)
 	store.UpdateStatus(jobID, jobs.StatusProcessing)
 
 	outputDir := filepath.Join("downloads", jobID)
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		errMsg := fmt.Sprintf("could not create output dir: %v", err)
-		log.Printf("[JOB %s] ERROR: %s", jobID, errMsg)
+		slog.Error("download error", "jobID", jobID, "error", errMsg)
 		store.SetResult(jobID, "", 0, errMsg)
 		return
 	}
 
-	cmd := exec.Command("yt-dlp",
-		"--cookies", "cookies.txt",
+	baseArgs := []string{
 		"--no-playlist", "--extract-audio", "--audio-format", "mp3", "--audio-quality", "0",
 		"-o", "%(title)s.%(ext)s",
 		"-P", outputDir,
 		url,
-	)
+	}
+	cmd := exec.Command("yt-dlp", commandArgs(baseArgs)...)
 
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
 	if err := cmd.Start(); err != nil {
 		errMsg := fmt.Sprintf("failed to start command: %v", err)
-		log.Printf("[JOB %s] ERROR: %s", jobID, errMsg)
+		slog.Error("download error", "jobID", jobID, "error", errMsg)
 		store.SetResult(jobID, "", 0, errMsg)
 		return
 	}
@@ -81,16 +95,16 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, url string) {
 
 	if err != nil {
 		errMsg := "yt-dlp command finished with an error."
-		log.Printf("[JOB %s] ERROR: %s", jobID, errMsg)
+		slog.Error("download error", "jobID", jobID, "error", errMsg)
 		store.SetResult(jobID, "", 0, errMsg)
 		return
 	}
 
-	log.Printf("[JOB %s] Command finished. Searching for MP3 file.", jobID)
+	slog.Info("command finished, searching for MP3 file", "jobID", jobID)
 	files, err := os.ReadDir(outputDir)
 	if err != nil {
 		errMsg := fmt.Sprintf("could not read output dir: %v", err)
-		log.Printf("[JOB %s] ERROR: %s", jobID, errMsg)
+		slog.Error("download error", "jobID", jobID, "error", errMsg)
 		store.SetResult(jobID, "", 0, errMsg)
 		return
 	}
@@ -101,21 +115,21 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, url string) {
 
 			fileInfo, err := os.Stat(mp3Path)
 			if err != nil {
-				errMsg := fmt.Sprintf("could not get file info for %s: %v", mp3Path, err)
-				log.Printf("[JOB %s] ERROR: %s", jobID, errMsg)
+				errMsg := fmt.Sprintf("could not get file info: %v", err)
+				slog.Error("download error", "jobID", jobID, "path", mp3Path, "error", errMsg)
 				store.SetResult(jobID, "", 0, errMsg)
 				return
 			}
 
 			fileSize := fileInfo.Size()
-			log.Printf("[JOB %s] Found MP3 file: %s (Size: %d bytes)", jobID, mp3Path, fileSize)
+			slog.Info("found MP3 file", "jobID", jobID, "path", mp3Path, "size", fileSize)
 			store.SetResult(jobID, mp3Path, fileSize, "")
 			return
 		}
 	}
 
 	errMsg := "no mp3 file found after download"
-	log.Printf("[JOB %s] ERROR: %s", jobID, errMsg)
+	slog.Error("download error", "jobID", jobID, "error", errMsg)
 	store.SetResult(jobID, "", 0, errMsg)
 }
 
@@ -123,6 +137,10 @@ func logPipe(pipe io.ReadCloser, jobID string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	scanner := bufio.NewScanner(pipe)
 	for scanner.Scan() {
-		log.Printf("[JOB %s | yt-dlp] %s", jobID, scanner.Text())
+		line := scanner.Text()
+		if strings.HasPrefix(line, "[download]") {
+			continue
+		}
+		slog.Debug("yt-dlp output", "jobID", jobID, "output", line)
 	}
 }
