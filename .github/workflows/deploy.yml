@@ -68,13 +68,13 @@ jobs:
             echo "LATEST_STAGING_PATH: $LATEST_STAGING_PATH"
             echo "RELEASES_PATH: $RELEASES_PATH"
 
-            mkdir -p $RELEASES_PATH
+            mkdir -p "$RELEASES_PATH"
 
             RELEASE_TIMESTAMP=$(date +%Y%m%d%H%M%S)
             NEW_RELEASE_PATH="$RELEASES_PATH/$RELEASE_TIMESTAMP"
 
             echo "Creating new release directory: $NEW_RELEASE_PATH"
-            mkdir -p $NEW_RELEASE_PATH
+            mkdir -p "$NEW_RELEASE_PATH"
 
             echo "Contents of LATEST_STAGING_PATH ($LATEST_STAGING_PATH) BEFORE move:"
             ls -al "$LATEST_STAGING_PATH/" || true
@@ -99,11 +99,11 @@ jobs:
             sudo systemctl daemon-reload
 
             echo "Restarting service..."
-            systemctl restart yt-downloader.service
+            sudo systemctl restart yt-downloader.service
             
             echo "Checking service status (wait a few seconds for it to start):"
             sleep 5
-            systemctl status yt-downloader.service | head -n 3
+            sudo systemctl status yt-downloader.service | head -n 3
 
             echo "Cleaning up old releases (keeping last 5, for example)..."
             ls -dt "$RELEASES_PATH"/* | tail -n +6 | xargs rm -rf -- {} || true
