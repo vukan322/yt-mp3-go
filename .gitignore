@@ -20,3 +20,6 @@ downloads/*
 
 # YouTube Cookies
 cookies.txt
+
+# Environment
+.env
