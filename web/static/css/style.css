@@ -51,6 +51,7 @@ body.dark-theme {
     display: flex;
     gap: 1rem;
     align-items: center;
+    z-index: 10;
 }
 
 .lang-switcher {
@@ -136,7 +137,8 @@ header h1 {
 header p {
     font-size: 1.3rem;
     color: var(--muted-light);
-    white-space: nowrap;
+    white-space: normal;
+    margin-top: 1rem;
 }
 
 body.dark-theme header p {
@@ -441,12 +443,29 @@ footer a:hover {
     body {
         padding: 1rem;
     }
+
+    .controls {
+        position: static;
+        width: 100%;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+        top: auto;
+        right: auto;
+        padding-top: 0;
+    }
+
+    header {
+        padding-top: 0;
+        margin-bottom: 1.5rem;
+    }
+
     header h1 {
         font-size: 2.10rem;
     }
     header p {
         font-size: 1.10rem;
         white-space: normal;
+        margin-top: 0.5rem;
     }
     .yt-logo {
         width: 28px;
@@ -454,6 +473,9 @@ footer a:hover {
     }
     .logo-title {
         gap: 0.5rem;
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
     }
     .features-grid {
         grid-template-columns: 1fr;
