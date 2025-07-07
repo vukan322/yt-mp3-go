@@ -13,6 +13,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Clear Go Module Cache (if needed)
+        run: |
+          echo "Attempting to clean Go module cache..."
+          go clean -modcache || true
+        shell: bash
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -51,25 +57,34 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            APP_PATH="/var/www/yt-downloader"
-            LATEST_PATH="~/yt_downloader_latest"
+            APP_ROOT="/var/www/yt-downloader"
+            CURRENT_SYMLINK="$APP_ROOT/current"
+            RELEASES_PATH="$APP_ROOT/releases"
+            LATEST_STAGING_PATH="~/yt_downloader_latest"
 
-            echo "Moving new application files..."
-            mv $LATEST_PATH/yt-downloader $APP_PATH/
-            
-            echo "Replacing web assets and locales..."
-            rm -rf $APP_PATH/web
-            rm -rf $APP_PATH/locales
-            mv $LATEST_PATH/web $APP_PATH/
-            mv $LATEST_PATH/locales $APP_PATH/
-            
-            echo "Moving new files..."
-            mv ~/yt_downloader_latest/* $APP_PATH/
-            
+            mkdir -p $RELEASES_PATH
+
+            RELEASE_TIMESTAMP=$(date +%Y%m%d%H%M%S)
+            NEW_RELEASE_PATH="$RELEASES_PATH/$RELEASE_TIMESTAMP"
+
+            echo "Creating new release directory: $NEW_RELEASE_PATH"
+            mkdir -p $NEW_RELEASE_PATH
+
+            echo "Moving staged files to new release directory..."
+            mv $LATEST_STAGING_PATH/* $NEW_RELEASE_PATH/
+
+            echo "Updating 'current' symlink to new release..."
+            ln -sfn $NEW_RELEASE_PATH $APP_ROOT/next_release
+            mv -Tf $APP_ROOT/next_release $CURRENT_SYMLINK
+
             echo "Restarting service..."
             sudo systemctl restart yt-downloader.service
-            
-            echo "Cleaning up..."
-            rm -rf $LATEST_PATH
-            
-            echo "Deployment successful!"
+
+            echo "Cleaning up old releases (keeping last 5, for example)..."
+            ls -dt $RELEASES_PATH/* | tail -n +6 | xargs rm -rf -- {} || true
+
+            echo "Cleaning up staging directory..."
+            rm -rf $LATEST_STAGING_PATH
+
+            echo "Deployment successful! Current version points to: $(readlink -f $CURRENT_SYMLINK)"
+
