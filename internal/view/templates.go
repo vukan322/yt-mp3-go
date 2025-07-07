@@ -2,7 +2,8 @@ package view
 
 import (
 	"html/template"
-	"log"
+	"log/slog"
+	"os"
 )
 
 func ParseTemplates() *template.Template {
@@ -12,7 +13,8 @@ func ParseTemplates() *template.Template {
 
 	tmpl, err := template.New("").Funcs(fm).ParseGlob("./web/templates/*.gohtml")
 	if err != nil {
-		log.Fatalf("failed to parse templates: %v", err)
+		slog.Error("failed to parse templates", "error", err)
+		os.Exit(1)
 	}
 	return tmpl
 }

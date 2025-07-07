@@ -1,6 +1,7 @@
 package jobs
 
 import (
+	"log/slog"
 	"sync"
 	"time"
 
@@ -86,6 +87,7 @@ func (s *JobStore) SetResult(id, filePath string, fileSize int64, errStr string)
 
 		go func() {
 			time.Sleep(15 * time.Minute)
+			slog.Info("deleting old job from memory", "jobID", id)
 			s.Delete(id)
 		}()
 	}

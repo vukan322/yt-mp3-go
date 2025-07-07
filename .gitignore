@@ -17,3 +17,6 @@ main
 # Ignore downloaded files, but keep the directory in the repo
 downloads/*
 !downloads/.gitkeep
+
+# YouTube Cookies
+cookies.txt

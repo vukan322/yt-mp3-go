@@ -1,46 +1,49 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/vukan322/yt-mp3-go/internal/downloader"
 	"github.com/vukan322/yt-mp3-go/internal/handler"
 	"github.com/vukan322/yt-mp3-go/internal/jobs"
+	"github.com/vukan322/yt-mp3-go/internal/localization"
+	"github.com/vukan322/yt-mp3-go/internal/logger"
 	"github.com/vukan322/yt-mp3-go/internal/view"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
-
-	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"golang.org/x/text/language"
 )
 
 const basePath = "/yt-downloader"
 
 func main() {
-	bundle := i18n.NewBundle(language.English)
-	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
-	bundle.LoadMessageFile("./locales/en.json")
-	bundle.LoadMessageFile("./locales/sr.json")
+	logger.Setup()
+
+	bundle, err := localization.NewBundle("./locales")
+	if err != nil {
+		slog.Error("failed to create i18n bundle", "error", err)
+		os.Exit(1)
+	}
 
 	jobStore := jobs.NewStore()
-	downloader := &downloader.Downloader{}
 	templates := view.ParseTemplates()
 
 	appHandler := &handler.AppHandler{
+		Downloader: &downloader.Downloader{},
 		I18nBundle: bundle,
-		Downloader: downloader,
 		JobStore:   jobStore,
-		BasePath:   basePath,
 		Templates:  templates,
+		BasePath:   basePath,
 	}
 
 	go jobs.StartCleanupWorker(30*time.Minute, 2*time.Hour)
 
 	mux := appHandler.Routes()
 
-	log.Printf("Server starting on :8080, available at http://localhost:8080%s", basePath)
-	err := http.ListenAndServe(":8080", mux)
+	slog.Info("server starting", "address", "http://localhost:8080"+basePath)
+
+	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
-		log.Fatal("Server failed to start:", err)
+		slog.Error("server failed to start", "error", err)
+		os.Exit(1)
 	}
 }
