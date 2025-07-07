@@ -17,6 +17,8 @@ import (
 	"github.com/vukan322/yt-mp3-go/internal/view"
 )
 
+var version = "development"
+
 func main() {
 	_ = godotenv.Load()
 
@@ -38,6 +40,7 @@ func main() {
 		JobStore:   jobStore,
 		Templates:  templates,
 		BasePath:   conf.BasePath,
+		Version:    version,
 	}
 
 	go jobs.StartCleanupWorker(30*time.Minute, 2*time.Hour)

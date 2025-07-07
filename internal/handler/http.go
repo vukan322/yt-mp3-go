@@ -23,6 +23,7 @@ type AppHandler struct {
 	JobStore   *jobs.JobStore
 	BasePath   string
 	Templates  *template.Template
+	Version    string
 }
 
 func (h *AppHandler) Routes() *http.ServeMux {
@@ -149,6 +150,7 @@ func (h *AppHandler) HandleIndex(w http.ResponseWriter, r *http.Request) {
 	data := map[string]any{
 		"Lang":     lang,
 		"BasePath": h.BasePath,
+		"Version":  h.Version,
 	}
 
 	err = tmpl.ExecuteTemplate(w, "layout.gohtml", data)

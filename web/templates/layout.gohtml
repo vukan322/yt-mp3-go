@@ -36,7 +36,12 @@
     </div>
     
     <footer>
-        © 2025 <a href="https://lukavukanovic.xyz" target="_blank" rel="noopener noreferrer">Luka Vukanović</a>. {{Localize "footerText"}}
+        <div>
+            © 2025 <a href="https://lukavukanovic.xyz" target="_blank" rel="noopener noreferrer">Luka Vukanović</a>. {{Localize "footerText"}}
+        </div>
+        <div class="footer-version">
+            {{Localize "versionLabel"}} {{.Version}}
+        </div>
     </footer>
 
     <script src="{{.BasePath}}/static/js/main.js" type="module"></script>

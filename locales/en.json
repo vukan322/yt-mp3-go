@@ -21,5 +21,6 @@
   "featureThreeDesc": { "translation": "Your download is processed in the background so you can keep browsing." },
   "featureFourTitle": { "translation": "No Ads, No Fees" },
   "featureFourDesc": { "translation": "This service is completely free to use with no intrusive ads or hidden costs." },
-  "footerText": { "translation": "All rights reserved." }
+  "footerText": { "translation": "All rights reserved." },
+  "versionLabel": { "translation": "Version:" }
 }
