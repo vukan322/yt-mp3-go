@@ -61,6 +61,13 @@ jobs:
             RELEASES_PATH="$APP_ROOT/releases"
             LATEST_STAGING_PATH="~/yt_downloader_latest"
 
+            echo "--- Debugging Deployment ---"
+            echo "Current user: $(whoami)"
+            echo "Home directory: ~"
+            echo "APP_ROOT: $APP_ROOT"
+            echo "LATEST_STAGING_PATH: $LATEST_STAGING_PATH"
+            echo "RELEASES_PATH: $RELEASES_PATH"
+
             mkdir -p $RELEASES_PATH
 
             RELEASE_TIMESTAMP=$(date +%Y%m%d%H%M%S)
@@ -69,15 +76,31 @@ jobs:
             echo "Creating new release directory: $NEW_RELEASE_PATH"
             mkdir -p $NEW_RELEASE_PATH
 
-            echo "Moving staged files to new release directory..."
-            mv $LATEST_STAGING_PATH/* $NEW_RELEASE_PATH/
+            echo "Contents of LATEST_STAGING_PATH ($LATEST_STAGING_PATH) BEFORE move:"
+            ls -al $LATEST_STAGING_PATH/ || true
+
+            echo "Moving staged files to new release directory ($NEW_RELEASE_PATH)..."
+            mv -v $LATEST_STAGING_PATH/* $NEW_RELEASE_PATH/
+
+            echo "Contents of LATEST_STAGING_PATH ($LATEST_STAGING_PATH) AFTER move:"
+            ls -al $LATEST_STAGING_PATH/ || true
+
+            echo "Contents of NEW_RELEASE_PATH ($NEW_RELEASE_PATH) AFTER move:"
+            ls -al $NEW_RELEASE_PATH/ || true
 
             echo "Updating 'current' symlink to new release..."
             ln -sfn $NEW_RELEASE_PATH $APP_ROOT/next_release
             mv -Tf $APP_ROOT/next_release $CURRENT_SYMLINK
 
+            echo "Verifying 'current' symlink target:"
+            ls -l $CURRENT_SYMLINK || true
+
             echo "Restarting service..."
             sudo systemctl restart yt-downloader.service
+            
+            echo "Checking service status (wait a few seconds for it to start):"
+            sleep 3
+            sudo systemctl status yt-downloader.service | head -n 3
 
             echo "Cleaning up old releases (keeping last 5, for example)..."
             ls -dt $RELEASES_PATH/* | tail -n +6 | xargs rm -rf -- {} || true
@@ -86,4 +109,4 @@ jobs:
             rm -rf $LATEST_STAGING_PATH
 
             echo "Deployment successful! Current version points to: $(readlink -f $CURRENT_SYMLINK)"
-
+            echo "--- End Debugging Deployment ---"
