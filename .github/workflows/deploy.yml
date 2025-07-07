@@ -52,11 +52,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             APP_PATH="/var/www/yt-downloader"
+            LATEST_PATH="~/yt_downloader_latest"
+
+            echo "Moving new application files..."
+            mv $LATEST_PATH/yt-downloader $APP_PATH/
             
-            echo "Clearing old app files..."
-            rm -f $APP_PATH/yt-downloader
+            echo "Replacing web assets and locales..."
             rm -rf $APP_PATH/web
             rm -rf $APP_PATH/locales
+            mv $LATEST_PATH/web $APP_PATH/
+            mv $LATEST_PATH/locales $APP_PATH/
             
             echo "Moving new files..."
             mv ~/yt_downloader_latest/* $APP_PATH/
@@ -65,6 +70,6 @@ jobs:
             sudo systemctl restart yt-downloader.service
             
             echo "Cleaning up..."
-            rm -rf ~/yt_downloader_latest
+            rm -rf $LATEST_PATH
             
             echo "Deployment successful!"
