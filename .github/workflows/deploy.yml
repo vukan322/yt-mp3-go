@@ -95,6 +95,9 @@ jobs:
             echo "Verifying 'current' symlink target:"
             ls -l "$CURRENT_SYMLINK" || true
 
+            echo "Reloading systemd daemon to pick up symlink changes..."
+            sudo systemctl daemon-reload
+
             echo "Restarting service..."
             systemctl restart yt-downloader.service
             
