@@ -32,7 +32,7 @@ This project was brought to life with these modern technologies:
 
 To run this project locally, you must have the following installed and available in your system's `PATH`.
 
-- **Go** (version 1.21 or later)
+- **Go** (version 1.22 or later)
 - **`yt-dlp`** & **`ffmpeg`**:
 
   ### macOS
@@ -53,19 +53,45 @@ To run this project locally, you must have the following installed and available
     cd yt-mp3-go
     ```
 
-2.  **Tidy dependencies:**
+2.  **Set up your environment:**
+    Copy the example environment file and edit it if needed.
+    ```sh
+    cp .env.example .env
+    ```
+
+3.  **Tidy dependencies:**
     This will download the required Go modules.
     ```sh
     go mod tidy
     ```
 
-3.  **Run the application:**
+4.  **Run the application:**
     ```sh
     go run ./cmd/server/main.go
     ```
 
-4.  **Open in your browser:**
-    The application will be available at `http://localhost:8080/yt-downloader`.
+5.  **Open in your browser:**
+    By default, the application will be available at `http://localhost:8080/yt-downloader`.
+
+## Configuration
+
+The application is configured using environment variables, which are loaded from a .env file during local development.
+
+|  Variable                     | Description                                                           |  Default                      |
+|:------------------------------|:----------------------------------------------------------------------|:------------------------------|
+|   **APP_ENV**                 |  The application environment (**development** or **production**).     | **development**               |
+|   **DOMAIN**                  |  The domain the application is running on.                            | **localhost**                 |
+|   **PORT**                    |  The port the application will listen on.                             | **8080**                      |
+|   **BASE_PATH**               |  The URL path prefix for the application.                             | **/yt-downloader**            |
+
+## Deployment
+
+This project is configured for continuous deployment using GitHub Actions.
+
+ - **Trigger**: A push to the `main` branch automatically triggers the build and deployment workflow.
+ - **Strategy**: The deployment is **atomic**, meaning it uses a timestamped release directory and a current symlink to ensure zero downtime.
+ - **Versioning**: The application version is automatically injected at build time. The format is `MAJOR.MINOR.PATCH`, 
+ where the `PATCH` number is the GitHub Actions run number.
 
 ## License
 
