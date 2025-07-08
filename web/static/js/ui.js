@@ -34,7 +34,8 @@ export function resetUi() {
     elements.infoForm.style.display = 'flex';
     elements.statusArea.style.display = 'none';
     elements.statusArea.classList.remove('is-processing');
-    elements.urlInput.value = ''; // Bug 2 Fixed
+    elements.urlInput.value = '';
+    elements.thumbnail.src = '';
 }
 
 export function showSubmittingState() {
@@ -46,6 +47,8 @@ export function showSubmittingState() {
     elements.qualitySelectorArea.style.display = 'none';
     elements.startDownloadButton.style.display = 'none';
     elements.resetButton.style.display = 'none';
+    elements.thumbnail.style.display = 'none';
+    elements.videoTitle.textContent = '';
 }
 
 export function showInfoResult(metadata) {
