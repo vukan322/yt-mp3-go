@@ -1,22 +1,21 @@
 {{define "content"}}
-<form id="download-form" action="{{.BasePath}}/download" method="POST" class="download-form">
+<form id="info-form" action="{{.BasePath}}/info" method="POST" class="download-form">
     <div class="input-group">
         <input type="url" name="url" id="url-input" placeholder="{{Localize "urlInputPlaceholder"}}" required>
         <button type="button" id="paste-button" title="{{Localize "pasteButtonTitle"}}">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
         </button>
     </div>
-    <button type="submit" id="submit-button" title="{{Localize "downloadButtonTitle"}}">{{Localize "downloadButton"}}</button>
+    <button type="submit" id="submit-button" title="{{Localize "downloadButtonTitle"}}">{{Localize "getInfoButton"}}</button>
 </form>
 
 <div id="status-area" class="status-card" style="display: none; margin-top: 2rem;"
-    data-submitting-text="{{Localize "statusSubmitting"}}"
-    data-processing-text="{{Localize "statusProcessing"}}"
-    data-ready-text="{{Localize "statusReady"}}"
-    data-failed-text="{{Localize "statusFailed"}}"
-    data-connection-lost-text="{{Localize "statusConnectionLost"}}"
-    data-download-file-text="{{Localize "downloadFile"}}"
-    data-file-size-label="{{Localize "fileSizeLabel"}}">
+     data-submitting-text="{{Localize "statusSubmitting"}}"
+     data-processing-text="{{Localize "statusProcessing"}}"
+     data-ready-text="{{Localize "statusReady"}}"
+     data-failed-text="{{Localize "statusFailed"}}"
+     data-connection-lost-text="{{Localize "statusConnectionLost"}}"
+     data-download-file-text="{{Localize "downloadFile"}}">
 
     <button id="reset-button" title="{{Localize "resetButtonTitle"}}">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -24,11 +23,24 @@
 
     <img id="thumbnail" src="" alt="Video thumbnail" style="display: none;" />
     <h2 id="video-title"></h2>
+
+    <div id="quality-selector-area" style="display: none; margin: 1.5rem 0;">
+        <p class="quality-title">{{Localize "qualityTitle"}}</p>
+        <div class="quality-selector">
+            <div class="quality-slider"></div>
+            <button class="quality-option" data-quality="low" data-desc="{{Localize "qualityLowDesc"}}">{{Localize "qualityLow"}}</button>
+            <button class="quality-option" data-quality="medium" data-desc="{{Localize "qualityMediumDesc"}}">{{Localize "qualityMedium"}}</button>
+            <button class="quality-option active recommended" data-quality="high" data-desc="{{Localize "qualityHighDesc"}}">{{Localize "qualityHigh"}}</button>
+        </div>
+        <p id="quality-description">{{Localize "qualityHighDesc"}}</p>
+    </div>
+
     <div id="spinner" class="spinner"></div>
     <p id="status-text"></p>
-    <a href="#" id="download-link"></a>
 
-    <p id="file-size-text"></p>
+    <button id="start-download-button" style="display: none;">{{Localize "downloadButton"}}</button>
+
+    <a href="#" id="download-link"></a>
     <p id="error-message"></p>
 </div>
 

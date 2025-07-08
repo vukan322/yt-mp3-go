@@ -1,9 +1,8 @@
-import { elements, translations, updateUiForJobStatus } from './ui.js';
+import { basePath } from './ui.js';
 
-export async function submitUrl(formElement) {
+export async function getInfo(formElement) {
     const formData = new FormData(formElement);
-
-    const response = await fetch(`${elements.body.dataset.basePath}/download`, {
+    const response = await fetch(`${basePath}/info`, {
         method: 'POST',
         body: formData,
     });
@@ -12,23 +11,33 @@ export async function submitUrl(formElement) {
         const errorText = await response.text();
         throw new Error(errorText || 'Server responded with an error.');
     }
-
     return await response.json();
 }
 
-export function connectToJobEvents(job) {
+export async function startDownload(videoID, quality) {
+    const response = await fetch(`${basePath}/download`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoID, quality }),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Server responded with an error.');
+    }
+    return await response.json();
+}
+
+export function connectToJobEvents(jobID, onUpdate) {
     let jobIsFinished = false;
-    const eventSource = new EventSource(`${elements.body.dataset.basePath}/events?id=${job.jobID}`);
+    const eventSource = new EventSource(`${basePath}/events?id=${jobID}`);
 
     eventSource.onmessage = (e) => {
-        const currentJobState = JSON.parse(sessionStorage.getItem('lastJob') || '{}');
-        const newUpdate = JSON.parse(e.data);
-        const finalState = { ...currentJobState, ...newUpdate };
+        const job = JSON.parse(e.data);
+        onUpdate(job);
 
-        if (finalState.status === 'complete' || finalState.status === 'failed') {
+        if (job.status === 'complete' || job.status === 'failed') {
             jobIsFinished = true;
-            sessionStorage.setItem('lastJob', JSON.stringify(finalState));
-            updateUiForJobStatus(finalState);
             eventSource.close();
         }
     };
@@ -36,11 +45,7 @@ export function connectToJobEvents(job) {
     eventSource.onerror = () => {
         eventSource.close();
         if (!jobIsFinished) {
-            elements.statusText.textContent = translations.failedText;
-            elements.errorMessage.textContent = translations.connectionLostText;
-            elements.spinner.style.display = 'none';
-            elements.resetButton.style.display = '';
+            onUpdate({ status: 'failed', error: 'Connection to server lost.' });
         }
     };
 }
-

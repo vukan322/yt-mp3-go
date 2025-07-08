@@ -33,6 +33,7 @@ func (h *AppHandler) Routes() *http.ServeMux {
 	mux.Handle(h.BasePath+"/static/", http.StripPrefix(h.BasePath+"/static/", staticFs))
 
 	mux.HandleFunc(h.BasePath+"/", h.HandleIndex)
+	mux.HandleFunc(h.BasePath+"/info", h.HandleInfo)
 	mux.HandleFunc(h.BasePath+"/download", h.HandleDownload)
 	mux.HandleFunc(h.BasePath+"/downloads/", h.HandleServeDownload)
 	mux.HandleFunc(h.BasePath+"/events", h.HandleStatusEvents)
@@ -40,7 +41,7 @@ func (h *AppHandler) Routes() *http.ServeMux {
 	return mux
 }
 
-func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
+func (h *AppHandler) HandleInfo(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
@@ -58,16 +59,44 @@ func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	job := h.JobStore.Create(url)
-	go h.Downloader.Download(h.JobStore, job.ID, url)
-	slog.Info("created job", "jobID", job.ID, "url", url)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(meta)
+}
+
+type DownloadRequest struct {
+	VideoID string `json:"videoID"`
+	Quality string `json:"quality"`
+}
+
+func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req DownloadRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		slog.Error("failed to decode download request", "error", err)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.VideoID == "" {
+		http.Error(w, "videoID is required", http.StatusBadRequest)
+		return
+	}
+	if req.Quality == "" {
+		req.Quality = "high"
+	}
+
+	quality := downloader.AudioQuality(req.Quality)
+
+	job := h.JobStore.Create(req.VideoID)
+	go h.Downloader.Download(h.JobStore, job.ID, req.VideoID, quality)
+	slog.Info("created job", "jobID", job.ID, "videoID", req.VideoID, "quality", req.Quality)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]any{
-		"jobID":     job.ID,
-		"title":     meta.Title,
-		"thumbnail": meta.Thumbnail,
-	})
+	json.NewEncoder(w).Encode(map[string]string{"jobID": job.ID})
 }
 
 func (h *AppHandler) HandleServeDownload(w http.ResponseWriter, r *http.Request) {
