@@ -58,27 +58,30 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             APP_ROOT="/var/www/yt-downloader"
-            CURRENT_SYMLINK="$APP_ROOT/current"
+            LATEST_STAGING_PATH="$HOME/yt_downloader_latest"
+            
             RELEASES_PATH="$APP_ROOT/releases"
-            LATEST_STAGING_PATH="$HOME/yt_downloader_latest" 
-
+            SHARED_PATH="$APP_ROOT/shared"
+            
             mkdir -p "$RELEASES_PATH"
-
+            mkdir -p "$SHARED_PATH/downloads"
+            
             RELEASE_TIMESTAMP=$(date +%Y%m%d%H%M%S)
             NEW_RELEASE_PATH="$RELEASES_PATH/$RELEASE_TIMESTAMP"
-
             mkdir -p "$NEW_RELEASE_PATH"
-
+            
             mv "$LATEST_STAGING_PATH"/* "$NEW_RELEASE_PATH/"
-
+            
+            rm -rf "$NEW_RELEASE_PATH/downloads"
+            
+            ln -s "$SHARED_PATH/downloads" "$NEW_RELEASE_PATH/downloads"
+            
             ln -sfn "$NEW_RELEASE_PATH" "$APP_ROOT/next_release"
-            mv -Tf "$APP_ROOT/next_release" "$CURRENT_SYMLINK"
-
-            sudo systemctl daemon-reload
+            mv -Tf "$APP_ROOT/next_release" "$APP_ROOT/current"
+            
             sudo systemctl restart yt-downloader.service
             
-            sleep 2
+            echo "Cleaning up old releases..."
             ls -dt "$RELEASES_PATH"/* | tail -n +6 | xargs rm -rf -- {} || true
-            rm -rf "$LATEST_STAGING_PATH"
-
-            echo "Deployment successful! Current version points to: $(readlink -f "$CURRENT_SYMLINK")"
+            
+            echo "Deployment successful! Current version points to: $(readlink -f "$APP_ROOT/current")"
