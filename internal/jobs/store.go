@@ -19,10 +19,9 @@ const (
 
 type Job struct {
 	ID       string    `json:"jobID"`
-	URL      string    `json:"-"`
+	VideoID  string    `json:"-"`
 	Status   JobStatus `json:"status"`
 	FilePath string    `json:"filePath"`
-	FileSize int64     `json:"fileSize"`
 	Error    string    `json:"error"`
 }
 
@@ -37,14 +36,14 @@ func NewStore() *JobStore {
 	}
 }
 
-func (s *JobStore) Create(url string) *Job {
+func (s *JobStore) Create(videoID string) *Job {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	job := &Job{
-		ID:     uuid.New().String(),
-		URL:    url,
-		Status: StatusPending,
+		ID:      uuid.New().String(),
+		VideoID: videoID,
+		Status:  StatusPending,
 	}
 	s.jobs[job.ID] = job
 	return job
@@ -72,7 +71,7 @@ func (s *JobStore) Delete(id string) {
 	delete(s.jobs, id)
 }
 
-func (s *JobStore) SetResult(id, filePath string, fileSize int64, errStr string) {
+func (s *JobStore) SetResult(id, filePath string, errStr string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if job, found := s.jobs[id]; found {
@@ -82,7 +81,6 @@ func (s *JobStore) SetResult(id, filePath string, fileSize int64, errStr string)
 		} else {
 			job.Status = StatusComplete
 			job.FilePath = filePath
-			job.FileSize = fileSize
 		}
 
 		go func() {

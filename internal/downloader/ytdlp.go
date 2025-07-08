@@ -58,23 +58,25 @@ func (d *Downloader) GetMetadata(url string) (*Metadata, error) {
 	return &meta, nil
 }
 
-func (d *Downloader) Download(store *jobs.JobStore, jobID, url string) {
-	slog.Info("starting download", "jobID", jobID)
+func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quality AudioQuality) {
+	slog.Info("starting download", "jobID", jobID, "videoID", videoID, "quality", quality)
 	store.UpdateStatus(jobID, jobs.StatusProcessing)
 
 	outputDir := filepath.Join("downloads", jobID)
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		errMsg := fmt.Sprintf("could not create output dir: %v", err)
 		slog.Error("download error", "jobID", jobID, "error", errMsg)
-		store.SetResult(jobID, "", 0, errMsg)
+		store.SetResult(jobID, "", errMsg)
 		return
 	}
 
+	audioQuality := quality.ToYtDlp()
+
 	baseArgs := []string{
-		"--no-playlist", "--extract-audio", "--audio-format", "mp3", "--audio-quality", "0",
-		"-o", "%(title)s.%(ext)s",
+		"--no-playlist", "--extract-audio", "--audio-format", "mp3",
+		"--audio-quality", audioQuality, "-o", "%(title)s.%(ext)s",
 		"-P", outputDir,
-		url,
+		videoID,
 	}
 	cmd := exec.Command("yt-dlp", commandArgs(baseArgs)...)
 
@@ -83,7 +85,7 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, url string) {
 	if err := cmd.Start(); err != nil {
 		errMsg := fmt.Sprintf("failed to start command: %v", err)
 		slog.Error("download error", "jobID", jobID, "error", errMsg)
-		store.SetResult(jobID, "", 0, errMsg)
+		store.SetResult(jobID, "", errMsg)
 		return
 	}
 	var wg sync.WaitGroup
@@ -96,7 +98,7 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, url string) {
 	if err != nil {
 		errMsg := "yt-dlp command finished with an error."
 		slog.Error("download error", "jobID", jobID, "error", errMsg)
-		store.SetResult(jobID, "", 0, errMsg)
+		store.SetResult(jobID, "", errMsg)
 		return
 	}
 
@@ -105,7 +107,7 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, url string) {
 	if err != nil {
 		errMsg := fmt.Sprintf("could not read output dir: %v", err)
 		slog.Error("download error", "jobID", jobID, "error", errMsg)
-		store.SetResult(jobID, "", 0, errMsg)
+		store.SetResult(jobID, "", errMsg)
 		return
 	}
 
@@ -117,20 +119,20 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, url string) {
 			if err != nil {
 				errMsg := fmt.Sprintf("could not get file info: %v", err)
 				slog.Error("download error", "jobID", jobID, "path", mp3Path, "error", errMsg)
-				store.SetResult(jobID, "", 0, errMsg)
+				store.SetResult(jobID, "", errMsg)
 				return
 			}
 
 			fileSize := fileInfo.Size()
 			slog.Info("found MP3 file", "jobID", jobID, "path", mp3Path, "size", fileSize)
-			store.SetResult(jobID, mp3Path, fileSize, "")
+			store.SetResult(jobID, mp3Path, "")
 			return
 		}
 	}
 
 	errMsg := "no mp3 file found after download"
 	slog.Error("download error", "jobID", jobID, "error", errMsg)
-	store.SetResult(jobID, "", 0, errMsg)
+	store.SetResult(jobID, "", errMsg)
 }
 
 func logPipe(pipe io.ReadCloser, jobID string, wg *sync.WaitGroup) {
