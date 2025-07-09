@@ -37,6 +37,10 @@ body.dark-theme {
     color: var(--text-dark);
 }
 
+button, a {
+    -webkit-tap-highlight-color: transparent;
+}
+
 .container {
     max-width: 600px;
     margin: 0 auto;
