@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -82,8 +83,11 @@ func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
 
 	quality := downloader.AudioQuality(req.Quality)
 
-	job := h.JobStore.Create(req.VideoID)
-	go h.Downloader.Download(h.JobStore, job.ID, req.VideoID, quality, req.Filename)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	job := h.JobStore.Add(req.VideoID, cancel)
+
+	go h.Downloader.Download(h.JobStore, job.ID, req.VideoID, quality, req.Filename, ctx)
 	slog.Info("created job", "jobID", job.ID, "videoID", req.VideoID, "quality", req.Quality, "filename", req.Filename)
 
 	w.Header().Set("Content-Type", "application/json")
@@ -178,4 +182,20 @@ func (h *AppHandler) HandleIndex(w http.ResponseWriter, r *http.Request) {
 		slog.Error("failed to execute template", "error", err)
 		http.Error(w, "Failed to execute template", http.StatusInternalServerError)
 	}
+}
+
+func (h *AppHandler) HandleCancel(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	jobID := r.URL.Query().Get("id")
+	if jobID == "" {
+		http.Error(w, "Job ID is required", http.StatusBadRequest)
+		return
+	}
+
+	h.JobStore.Cancel(jobID)
+	w.WriteHeader(http.StatusOK)
 }

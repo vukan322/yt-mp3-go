@@ -50,3 +50,15 @@ export function connectToJobEvents(jobID, onUpdate) {
         }
     };
 }
+
+export async function cancelJob(jobID) {
+    const response = await fetch(`${basePath}/cancel?id=${jobID}`, {
+        method: 'POST',
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Server responded with an error during cancellation.');
+    }
+}
+

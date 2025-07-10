@@ -1,6 +1,7 @@
 package jobs
 
 import (
+	"context"
 	"log/slog"
 	"sync"
 	"time"
@@ -18,11 +19,12 @@ const (
 )
 
 type Job struct {
-	ID       string    `json:"jobID"`
-	VideoID  string    `json:"-"`
-	Status   JobStatus `json:"status"`
-	FilePath string    `json:"filePath"`
-	Error    string    `json:"error"`
+	ID       string             `json:"jobID"`
+	VideoID  string             `json:"-"`
+	Status   JobStatus          `json:"status"`
+	FilePath string             `json:"filePath"`
+	Error    string             `json:"error"`
+	cancel   context.CancelFunc `json:"-"`
 }
 
 type JobStore struct {
@@ -36,7 +38,7 @@ func NewStore() *JobStore {
 	}
 }
 
-func (s *JobStore) Create(videoID string) *Job {
+func (s *JobStore) Add(videoID string, cancel context.CancelFunc) *Job {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -44,6 +46,7 @@ func (s *JobStore) Create(videoID string) *Job {
 		ID:      uuid.New().String(),
 		VideoID: videoID,
 		Status:  StatusPending,
+		cancel:  cancel,
 	}
 	s.jobs[job.ID] = job
 	return job
@@ -65,6 +68,16 @@ func (s *JobStore) UpdateStatus(id string, status JobStatus) {
 	}
 }
 
+func (s *JobStore) Cancel(id string) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if job, found := s.jobs[id]; found {
+		if job.cancel != nil {
+			job.cancel()
+		}
+	}
+}
+
 func (s *JobStore) Delete(id string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -82,6 +95,8 @@ func (s *JobStore) SetResult(id, filePath string, errStr string) {
 			job.Status = StatusComplete
 			job.FilePath = filePath
 		}
+
+		job.cancel = nil
 
 		go func() {
 			time.Sleep(15 * time.Minute)

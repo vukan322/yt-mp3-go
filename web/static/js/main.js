@@ -1,6 +1,6 @@
 import { initializeThemeSwitcher } from './theme.js';
 import { elements, cacheDOMElements, resetUi, showSubmittingState, showInfoResult, showDownloadInProgress, showDownloadResult, showError, restoreUiFromState, updateSliderPosition, showFilenameError, clearFilenameError } from './ui.js';
-import { getInfo, startDownload, connectToJobEvents } from './api.js';
+import { getInfo, startDownload, connectToJobEvents, cancelJob } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     cacheDOMElements();
@@ -99,6 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     elements.resetButton.addEventListener('click', () => {
+        if (state.jobID) {
+            cancelJob(state.jobID).catch(err => console.error("Cancel request failed:", err));
+        }
+
         sessionStorage.removeItem('yt-downloader-state');
         state = {};
         resetUi();
