@@ -3,6 +3,7 @@ package downloader
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -66,7 +67,7 @@ func sanitizeFilename(filename string) string {
 	return strings.TrimSpace(sanitized)
 }
 
-func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quality AudioQuality, filename string) {
+func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quality AudioQuality, filename string, ctx context.Context) {
 	slog.Info("starting download", "jobID", jobID, "videoID", videoID, "quality", quality)
 	store.UpdateStatus(jobID, jobs.StatusProcessing)
 
@@ -90,7 +91,7 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quali
 		"--audio-quality", audioQuality, "-o", outputTemplate,
 		"-P", outputDir, videoID,
 	}
-	cmd := exec.Command("yt-dlp", commandArgs(baseArgs)...)
+	cmd := exec.CommandContext(ctx, "yt-dlp", commandArgs(baseArgs)...)
 
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
@@ -108,6 +109,11 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quali
 	wg.Wait()
 
 	if err != nil {
+		if ctx.Err() == context.Canceled {
+			slog.Info("download cancelled by user", "jobID", jobID)
+			store.SetResult(jobID, "", "Download cancelled by user.")
+			return
+		}
 		errMsg := "yt-dlp command finished with an error."
 		slog.Error("download error", "jobID", jobID, "error", errMsg)
 		store.SetResult(jobID, "", errMsg)

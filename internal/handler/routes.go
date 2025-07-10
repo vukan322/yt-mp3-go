@@ -13,6 +13,7 @@ func (h *AppHandler) Routes() *http.ServeMux {
 	mux.HandleFunc(h.BasePath+"/download", h.HandleDownload)
 	mux.HandleFunc(h.BasePath+"/downloads/", h.HandleServeDownload)
 	mux.HandleFunc(h.BasePath+"/events", h.HandleStatusEvents)
+	mux.HandleFunc(h.BasePath+"/cancel", h.HandleCancel)
 
 	return mux
 }
