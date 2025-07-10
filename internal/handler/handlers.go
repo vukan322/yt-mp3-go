@@ -26,19 +26,10 @@ type AppHandler struct {
 	Version    string
 }
 
-func (h *AppHandler) Routes() *http.ServeMux {
-	mux := http.NewServeMux()
-
-	staticFs := http.FileServer(http.Dir("./web/static"))
-	mux.Handle(h.BasePath+"/static/", http.StripPrefix(h.BasePath+"/static/", staticFs))
-
-	mux.HandleFunc(h.BasePath+"/", h.HandleIndex)
-	mux.HandleFunc(h.BasePath+"/info", h.HandleInfo)
-	mux.HandleFunc(h.BasePath+"/download", h.HandleDownload)
-	mux.HandleFunc(h.BasePath+"/downloads/", h.HandleServeDownload)
-	mux.HandleFunc(h.BasePath+"/events", h.HandleStatusEvents)
-
-	return mux
+type DownloadRequest struct {
+	VideoID  string `json:"videoID"`
+	Quality  string `json:"quality"`
+	Filename string `json:"filename"`
 }
 
 func (h *AppHandler) HandleInfo(w http.ResponseWriter, r *http.Request) {
@@ -61,12 +52,6 @@ func (h *AppHandler) HandleInfo(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(meta)
-}
-
-type DownloadRequest struct {
-	VideoID  string `json:"videoID"`
-	Quality  string `json:"quality"`
-	Filename string `json:"filename"`
 }
 
 func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {

@@ -47,17 +47,22 @@ func main() {
 
 	mux := appHandler.Routes()
 
+	startServer(mux, conf)
+}
+
+func startServer(mux *http.ServeMux, conf *config.Config) {
 	var serverURL string
+
 	if conf.Environment == "production" {
 		serverURL = fmt.Sprintf("https://%s%s", conf.Domain, conf.BasePath)
 	} else {
 		serverURL = fmt.Sprintf("http://%s:%s%s", conf.Domain, conf.Port, conf.BasePath)
 	}
 
-	listenAddr := fmt.Sprintf(":%s", conf.Port)
 	slog.Info("server starting", "address", serverURL, "env", conf.Environment)
 
-	err = http.ListenAndServe(listenAddr, mux)
+	listenAddr := fmt.Sprintf(":%s", conf.Port)
+	err := http.ListenAndServe(listenAddr, mux)
 	if err != nil {
 		slog.Error("server failed to start", "error", err)
 		os.Exit(1)
