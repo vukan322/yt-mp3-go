@@ -14,11 +14,11 @@ export async function getInfo(formElement) {
     return await response.json();
 }
 
-export async function startDownload(videoID, quality) {
+export async function startDownload(videoID, quality, filename) {
     const response = await fetch(`${basePath}/download`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoID, quality }),
+        body: JSON.stringify({ videoID, quality, filename }),
     });
 
     if (!response.ok) {
@@ -27,6 +27,7 @@ export async function startDownload(videoID, quality) {
     }
     return await response.json();
 }
+
 
 export function connectToJobEvents(jobID, onUpdate) {
     let jobIsFinished = false;

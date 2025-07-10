@@ -64,8 +64,9 @@ func (h *AppHandler) HandleInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 type DownloadRequest struct {
-	VideoID string `json:"videoID"`
-	Quality string `json:"quality"`
+	VideoID  string `json:"videoID"`
+	Quality  string `json:"quality"`
+	Filename string `json:"filename"`
 }
 
 func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
@@ -88,12 +89,17 @@ func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
 	if req.Quality == "" {
 		req.Quality = "high"
 	}
+	if req.Filename == "" {
+		slog.Warn("download request received with empty filename", "videoID", req.VideoID)
+		http.Error(w, "filename is required", http.StatusBadRequest)
+		return
+	}
 
 	quality := downloader.AudioQuality(req.Quality)
 
 	job := h.JobStore.Create(req.VideoID)
-	go h.Downloader.Download(h.JobStore, job.ID, req.VideoID, quality)
-	slog.Info("created job", "jobID", job.ID, "videoID", req.VideoID, "quality", req.Quality)
+	go h.Downloader.Download(h.JobStore, job.ID, req.VideoID, quality, req.Filename)
+	slog.Info("created job", "jobID", job.ID, "videoID", req.VideoID, "quality", req.Quality, "filename", req.Filename)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"jobID": job.ID})

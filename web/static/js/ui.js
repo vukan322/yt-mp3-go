@@ -1,27 +1,35 @@
-export const elements = {
-    body: document.body,
-    infoForm: document.getElementById('info-form'),
-    urlInput: document.getElementById('url-input'),
-    pasteButton: document.getElementById('paste-button'),
-    submitButton: document.getElementById('submit-button'),
-    statusArea: document.getElementById('status-area'),
-    resetButton: document.getElementById('reset-button'),
-    thumbnail: document.getElementById('thumbnail'),
-    videoTitle: document.getElementById('video-title'),
-    qualitySelectorArea: document.getElementById('quality-selector-area'),
-    qualitySelector: document.querySelector('.quality-selector'),
-    qualitySlider: document.querySelector('.quality-slider'),
-    qualityOptions: document.querySelectorAll('.quality-option'),
-    qualityDescription: document.getElementById('quality-description'),
-    startDownloadButton: document.getElementById('start-download-button'),
-    spinner: document.getElementById('spinner'),
-    statusText: document.getElementById('status-text'),
-    downloadLink: document.getElementById('download-link'),
-    errorMessage: document.getElementById('error-message'),
-};
+export const elements = {};
 
-export const translations = elements.statusArea.dataset;
-export const basePath = elements.body.dataset.basePath || '';
+export let translations = {};
+export let basePath = '';
+
+export function cacheDOMElements() {
+    elements.body = document.body;
+    elements.infoForm = document.getElementById('info-form');
+    elements.urlInput = document.getElementById('url-input');
+    elements.pasteButton = document.getElementById('paste-button');
+    elements.submitButton = document.getElementById('submit-button');
+    elements.statusArea = document.getElementById('status-area');
+    elements.resetButton = document.getElementById('reset-button');
+    elements.thumbnail = document.getElementById('thumbnail');
+    elements.videoTitle = document.getElementById('video-title');
+    elements.qualitySelectorArea = document.getElementById('quality-selector-area');
+    elements.qualitySelector = document.querySelector('.quality-selector');
+    elements.qualitySlider = document.querySelector('.quality-slider');
+    elements.qualityOptions = document.querySelectorAll('.quality-option');
+    elements.qualityDescription = document.getElementById('quality-description');
+    elements.startDownloadButton = document.getElementById('start-download-button');
+    elements.spinner = document.getElementById('spinner');
+    elements.statusText = document.getElementById('status-text');
+    elements.downloadLink = document.getElementById('download-link');
+    elements.errorMessage = document.getElementById('error-message');
+    elements.downloadOptionsArea = document.getElementById('download-options-area');
+    elements.filenameInput = document.getElementById('filename-input');
+    elements.filenameResetButton = document.getElementById('filename-reset-button');
+
+    translations = elements.statusArea.dataset;
+    basePath = elements.body.dataset.basePath || '';
+}
 
 export function updateSliderPosition(targetButton) {
     if (!targetButton || !elements.qualitySlider) return;
@@ -33,9 +41,16 @@ export function updateSliderPosition(targetButton) {
 export function resetUi() {
     elements.infoForm.style.display = 'flex';
     elements.statusArea.style.display = 'none';
-    elements.statusArea.classList.remove('is-processing');
+    elements.downloadOptionsArea.style.display = 'none';
     elements.urlInput.value = '';
     elements.thumbnail.src = '';
+    elements.videoTitle.textContent = '';
+    elements.filenameInput.value = '';
+    elements.statusText.textContent = '';
+    elements.errorMessage.textContent = '';
+    elements.statusArea.classList.remove('is-processing');
+    elements.filenameInput.classList.remove('error');
+    elements.errorMessage.classList.remove('visible');
 }
 
 export function showSubmittingState() {
@@ -51,23 +66,24 @@ export function showSubmittingState() {
     elements.videoTitle.textContent = '';
 }
 
-export function showInfoResult(metadata) {
+export function showInfoResult(metadata, state) {
     elements.statusArea.classList.remove('is-processing');
     elements.spinner.style.display = 'none';
     elements.statusText.textContent = '';
     elements.resetButton.style.display = 'block';
-
     elements.thumbnail.src = metadata.thumbnail;
     elements.thumbnail.style.display = 'block';
     elements.videoTitle.textContent = metadata.title;
+    elements.filenameInput.value = state.filename || metadata.title;
     elements.qualitySelectorArea.style.display = 'block';
+    elements.downloadOptionsArea.style.display = 'block';
     elements.startDownloadButton.style.display = 'block';
-
     setTimeout(() => updateSliderPosition(document.querySelector('.quality-option.active')), 10);
 }
 
 export function showDownloadInProgress() {
     elements.qualitySelectorArea.style.display = 'none';
+    elements.downloadOptionsArea.style.display = 'none';
     elements.startDownloadButton.style.display = 'none';
     elements.spinner.style.display = 'block';
     elements.statusText.textContent = translations.processingText;
@@ -78,16 +94,19 @@ export function showDownloadResult(job, state) {
     elements.statusArea.classList.remove('is-processing');
     elements.spinner.style.display = 'none';
     elements.resetButton.style.display = 'block';
-
     if (job.status === 'complete') {
         elements.statusText.textContent = translations.readyText;
         elements.downloadLink.href = `${basePath}/${job.filePath}`;
         elements.downloadLink.click();
 
-        setTimeout(() => {
-            showInfoResult({ thumbnail: state.thumbnail, title: state.title });
-        }, 2500);
+        state.jobID = null;
+        state.jobStatus = null;
+        state.filePath = null;
+        sessionStorage.setItem('yt-downloader-state', JSON.stringify(state));
 
+        setTimeout(() => {
+            showInfoResult({ thumbnail: state.thumbnail, title: state.title }, state);
+        }, 2500);
     } else if (job.status === 'failed') {
         elements.statusText.textContent = translations.failedText;
         elements.errorMessage.textContent = job.error;
@@ -100,10 +119,9 @@ export function showError(message) {
     elements.spinner.style.display = 'none';
     elements.qualitySelectorArea.style.display = 'none';
     elements.startDownloadButton.style.display = 'none';
-
     elements.statusText.textContent = translations.failedText;
     elements.errorMessage.textContent = message;
-    elements.errorMessage.style.display = 'block';
+    elements.errorMessage.classList.add('visible');
     elements.resetButton.style.display = 'block';
 }
 
@@ -115,6 +133,7 @@ export function restoreUiFromState(state) {
     elements.thumbnail.src = state.thumbnail;
     elements.thumbnail.style.display = 'block';
     elements.videoTitle.textContent = state.title;
+    elements.filenameInput.value = state.filename || state.title;
 
     if (state.jobID && state.jobStatus !== 'complete' && state.jobStatus !== 'failed') {
         showDownloadInProgress();
@@ -122,7 +141,21 @@ export function restoreUiFromState(state) {
         const job = { status: state.jobStatus, filePath: state.filePath, error: state.error };
         showDownloadResult(job, state);
     } else {
-        showInfoResult({ thumbnail: state.thumbnail, title: state.title });
+        showInfoResult({ thumbnail: state.thumbnail, title: state.title }, state);
     }
+
     return true;
+}
+
+export function showFilenameError() {
+    elements.filenameInput.classList.add('error');
+    elements.errorMessage.textContent = translations.filenameRequiredText;
+    elements.errorMessage.classList.add('visible');
+    elements.startDownloadButton.disabled = true;
+}
+
+export function clearFilenameError() {
+    elements.filenameInput.classList.remove('error');
+    elements.errorMessage.classList.remove('visible');
+    elements.startDownloadButton.disabled = false;
 }

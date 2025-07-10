@@ -29,5 +29,8 @@
   "qualityLowDesc": { "translation": "Fastest / Smallest File" },
   "qualityMediumDesc": { "translation": "Good Balance" },
   "qualityHighDesc": { "translation": "Best Quality / Recommended" },
-  "getInfoButton": { "translation": "Start Downloading" }
+  "getInfoButton": { "translation": "Start Downloading" },
+  "filenameLabel": { "translation": "File name:" },
+  "filenameRequired": { "translation": "Please enter a filename." },
+  "resetFilenameTitle": { "translation": "Reset to original title" }
 }
