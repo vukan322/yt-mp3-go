@@ -11,6 +11,8 @@ Built with a robust Go backend and a dynamic, responsive frontend.
 - **Dynamic Frontend:** The UI is built with vanilla JavaScript, using AJAX for form submissions and dynamically updating the page content without requiring a full reload.
 - **Internationalization (i18n):** Fully localized interface supporting both English and Serbian, with language detection and a manual switcher.
 - **Modern UI/UX:** Features a clean, responsive design with light/dark themes, video thumbnail previews, file size display, and state persistence across page reloads using `sessionStorage`.
+- **Audio Quality Control**: Allows users to select from multiple quality presets (Low, Medium, High) to balance file size and audio quality.
+- **Custom Filenames**: Lets users easily edit the MP3 filename in the UI before downloading for better file organization.
 - **Playlist Safe:** Intelligently handles URLs that are part of a playlist, downloading only the single video specified by the user.
 - **No Ads, No Fees:** A clean, user-focused experience with no advertisements or hidden costs.
 
