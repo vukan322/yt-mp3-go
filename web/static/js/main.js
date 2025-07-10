@@ -1,8 +1,10 @@
 import { initializeThemeSwitcher } from './theme.js';
-import { elements, resetUi, showSubmittingState, showInfoResult, showDownloadInProgress, showDownloadResult, showError, restoreUiFromState, updateSliderPosition } from './ui.js';
+import { elements, cacheDOMElements, resetUi, showSubmittingState, showInfoResult, showDownloadInProgress, showDownloadResult, showError, restoreUiFromState, updateSliderPosition, showFilenameError, clearFilenameError } from './ui.js';
 import { getInfo, startDownload, connectToJobEvents } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    cacheDOMElements();
+
     initializeThemeSwitcher();
     let state = JSON.parse(sessionStorage.getItem('yt-downloader-state')) || {};
 
@@ -21,9 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const metadata = await getInfo(elements.infoForm);
-            state = { videoID: metadata.id, title: metadata.title, thumbnail: metadata.thumbnail };
+            state = {
+                videoID: metadata.id,
+                title: metadata.title,
+                thumbnail: metadata.thumbnail,
+                filename: metadata.title
+            };
             sessionStorage.setItem('yt-downloader-state', JSON.stringify(state));
-            showInfoResult(metadata);
+            showInfoResult(metadata, state);
         } catch (error) {
             console.error('Info Error:', error);
             showError(error.message);
@@ -46,10 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     elements.startDownloadButton.addEventListener('click', async () => {
         if (!state.videoID) return;
+
+        const filename = elements.filenameInput.value.trim();
+        if (!filename) {
+            showFilenameError();
+            return;
+        }
+        state.filename = filename;
+
         showDownloadInProgress();
 
         try {
-            const { jobID } = await startDownload(state.videoID, state.quality || 'high');
+            const { jobID } = await startDownload(state.videoID, state.quality || 'high', state.filename);
             state.jobID = jobID;
             sessionStorage.setItem('yt-downloader-state', JSON.stringify(state));
 
@@ -65,6 +80,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Download Error:', error);
             showError(error.message);
+        }
+    });
+
+    elements.filenameInput.addEventListener('input', () => {
+        clearFilenameError();
+
+        state.filename = elements.filenameInput.value;
+        sessionStorage.setItem('yt-downloader-state', JSON.stringify(state));
+    });
+
+    elements.filenameResetButton.addEventListener('click', () => {
+        if (state.title) {
+            elements.filenameInput.value = state.title;
+            state.filename = state.title;
+            sessionStorage.setItem('yt-downloader-state', JSON.stringify(state));
         }
     });
 

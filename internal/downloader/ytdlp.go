@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -58,7 +59,14 @@ func (d *Downloader) GetMetadata(url string) (*Metadata, error) {
 	return &meta, nil
 }
 
-func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quality AudioQuality) {
+var invalidFilenameChars = regexp.MustCompile(`[\\/:*?"<>|]`)
+
+func sanitizeFilename(filename string) string {
+	sanitized := invalidFilenameChars.ReplaceAllString(filename, "")
+	return strings.TrimSpace(sanitized)
+}
+
+func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quality AudioQuality, filename string) {
 	slog.Info("starting download", "jobID", jobID, "videoID", videoID, "quality", quality)
 	store.UpdateStatus(jobID, jobs.StatusProcessing)
 
@@ -71,12 +79,16 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quali
 	}
 
 	audioQuality := quality.ToYtDlp()
+	safeFilename := sanitizeFilename(filename)
+	if safeFilename == "" {
+		safeFilename = videoID
+	}
+	outputTemplate := fmt.Sprintf("%s.%%(ext)s", safeFilename)
 
 	baseArgs := []string{
 		"--no-playlist", "--extract-audio", "--audio-format", "mp3",
-		"--audio-quality", audioQuality, "-o", "%(title)s.%(ext)s",
-		"-P", outputDir,
-		videoID,
+		"--audio-quality", audioQuality, "-o", outputTemplate,
+		"-P", outputDir, videoID,
 	}
 	cmd := exec.Command("yt-dlp", commandArgs(baseArgs)...)
 

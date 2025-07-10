@@ -15,7 +15,8 @@
      data-ready-text="{{Localize "statusReady"}}"
      data-failed-text="{{Localize "statusFailed"}}"
      data-connection-lost-text="{{Localize "statusConnectionLost"}}"
-     data-download-file-text="{{Localize "downloadFile"}}">
+     data-download-file-text="{{Localize "downloadFile"}}"
+     data-filename-required-text="{{Localize "filenameRequired"}}">
 
     <button id="reset-button" title="{{Localize "resetButtonTitle"}}">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -24,15 +25,32 @@
     <img id="thumbnail" src="" alt="Video thumbnail" style="display: none;" />
     <h2 id="video-title"></h2>
 
-    <div id="quality-selector-area" style="display: none; margin: 1.5rem 0;">
-        <p class="quality-title">{{Localize "qualityTitle"}}</p>
-        <div class="quality-selector">
-            <div class="quality-slider"></div>
-            <button class="quality-option" data-quality="low" data-desc="{{Localize "qualityLowDesc"}}">{{Localize "qualityLow"}}</button>
-            <button class="quality-option" data-quality="medium" data-desc="{{Localize "qualityMediumDesc"}}">{{Localize "qualityMedium"}}</button>
-            <button class="quality-option active recommended" data-quality="high" data-desc="{{Localize "qualityHighDesc"}}">{{Localize "qualityHigh"}}</button>
+    <div id="download-options-area" style="display: none; width: 100%; margin-top: 1.5rem;">
+    <div id="filename-wrapper" style="max-width: 450px; margin: 0 auto;">
+        <p class="section-title">
+            <span class="required-indicator">*</span>{{Localize "filenameLabel"}}
+        </p>
+        <div class="filename-input-group">
+            <input type="text" id="filename-input" class="filename-input">
+            <button type="button" id="filename-reset-button" title="{{Localize "resetFilenameTitle"}}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/></svg>
+            </button>
         </div>
-        <p id="quality-description">{{Localize "qualityHighDesc"}}</p>
+        <p id="error-message"></p>
+    </div>
+
+        <hr class="section-separator">
+
+        <div id="quality-selector-area">
+            <p class="section-title">{{Localize "qualityTitle"}}</p>
+            <div class="quality-selector">
+                <div class="quality-slider"></div>
+                <button class="quality-option" data-quality="low" data-desc="{{Localize "qualityLowDesc"}}">{{Localize "qualityLow"}}</button>
+                <button class="quality-option" data-quality="medium" data-desc="{{Localize "qualityMediumDesc"}}">{{Localize "qualityMedium"}}</button>
+                <button class="quality-option active recommended" data-quality="high" data-desc="{{Localize "qualityHighDesc"}}">{{Localize "qualityHigh"}}</button>
+            </div>
+            <p id="quality-description">{{Localize "qualityHighDesc"}}</p>
+        </div>
     </div>
 
     <div id="spinner" class="spinner"></div>
@@ -41,7 +59,6 @@
     <button id="start-download-button" style="display: none;">{{Localize "downloadButton"}}</button>
 
     <a href="#" id="download-link"></a>
-    <p id="error-message"></p>
 </div>
 
 <div class="features-grid">

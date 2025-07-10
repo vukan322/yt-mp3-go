@@ -29,5 +29,8 @@
   "qualityLowDesc": { "translation": "Najbrže / Najmanji fajl" },
   "qualityMediumDesc": { "translation": "Dobar balans" },
   "qualityHighDesc": { "translation": "Najbolji kvalitet / Preporučeno" },
-  "getInfoButton": { "translation": "Započni Preuzimanje" }
+  "getInfoButton": { "translation": "Započni Preuzimanje" },
+  "filenameLabel": { "translation": "Naziv datoteke:" },
+  "filenameRequired": {"translation": "Molimo vas unesite naziv datoteke." },
+  "resetFilenameTitle": { "translation": "Vrati na originalni naziv" }
 }
