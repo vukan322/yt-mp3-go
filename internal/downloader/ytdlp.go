@@ -19,6 +19,8 @@ import (
 
 const cookiesFile = "cookies.txt"
 
+var invalidFilenameChars = regexp.MustCompile(`[\\/:*?"<>|]`)
+
 type Metadata struct {
 	ID        string `json:"id"`
 	Title     string `json:"title"`
@@ -58,8 +60,6 @@ func (d *Downloader) GetMetadata(url string) (*Metadata, error) {
 	}
 	return &meta, nil
 }
-
-var invalidFilenameChars = regexp.MustCompile(`[\\/:*?"<>|]`)
 
 func sanitizeFilename(filename string) string {
 	sanitized := invalidFilenameChars.ReplaceAllString(filename, "")
