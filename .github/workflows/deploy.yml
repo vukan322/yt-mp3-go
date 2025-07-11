@@ -28,10 +28,10 @@ jobs:
       - name: Install esbuild
         run: go install github.com/evanw/esbuild/cmd/esbuild@latest
 
-      - name: Build CSS
+      - name: Build Assets
         run: |
-          chmod +x ./build.css.sh
-          ./build.css.sh
+          chmod +x ./build-assets.sh
+          ./build-assets.sh
 
       - name: Build Go Binary
         run: |

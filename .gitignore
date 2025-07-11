@@ -24,5 +24,6 @@ cookies.txt
 # Environment
 .env
 
-# Style: Ignore generated build artifacts
+# Ignore generated build artifacts
 /web/static/css/style.css
+/web/static/js/bundle.js
