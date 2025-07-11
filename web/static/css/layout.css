@@ -29,7 +29,7 @@ body.dark-theme .lang-switcher {
 .lang-switcher a {
     padding: 6px 12px;
     text-decoration: none;
-    color: var(--muted-light);
+    color: var(--title-light);
     font-size: 0.8rem;
     font-weight: 600;
     border-radius: 16px;
@@ -37,12 +37,13 @@ body.dark-theme .lang-switcher {
 }
 
 body.dark-theme .lang-switcher a {
-    color: var(--muted-dark);
+    color: var(--title-dark);
 }
 
 .lang-switcher a.active {
     background-color: var(--primary-color);
     color: white;
+    font-weight: 700;
 }
 
 .theme-switcher button {
@@ -138,7 +139,7 @@ body.dark-theme .features-grid {
     flex-shrink: 0;
 }
 
-.feature-card h3 {
+.feature-card h2 {
     margin: 0 0 0.25rem 0;
     font-size: 1rem;
     font-weight: 600;
