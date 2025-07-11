@@ -25,6 +25,14 @@ jobs:
           go-version: '1.22'
           cache: false
 
+      - name: Install esbuild
+        run: go install github.com/evanw/esbuild/cmd/esbuild@latest
+
+      - name: Build CSS
+        run: |
+          chmod +x ./build.css.sh
+          ./build.css.sh
+
       - name: Build Go Binary
         run: |
           VERSION="1.0.${{ github.run_number }}"
