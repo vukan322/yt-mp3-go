@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -17,6 +18,8 @@ import (
 	"github.com/vukan322/yt-mp3-go/internal/jobs"
 	"golang.org/x/text/language"
 )
+
+var youtubeURLRegex = regexp.MustCompile(`^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$`)
 
 type AppHandler struct {
 	I18nBundle *i18n.Bundle
@@ -41,6 +44,12 @@ func (h *AppHandler) HandleInfo(w http.ResponseWriter, r *http.Request) {
 	url := r.FormValue("url")
 	if url == "" {
 		http.Error(w, "URL is required", http.StatusBadRequest)
+		return
+	}
+
+	if !youtubeURLRegex.MatchString(url) {
+		slog.Warn("invalid youtube URL provided", "url", url)
+		http.Error(w, "Invalid YouTube URL provided", http.StatusBadRequest)
 		return
 	}
 

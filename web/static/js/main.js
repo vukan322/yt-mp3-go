@@ -1,16 +1,37 @@
 import { initializeThemeSwitcher } from './theme.js';
-import { elements, cacheDOMElements, resetUi, showSubmittingState, showInfoResult, showDownloadInProgress, showDownloadResult, showError, restoreUiFromState, updateSliderPosition, showFilenameError, clearFilenameError } from './ui.js';
+import { elements, cacheDOMElements, resetUi, showSubmittingState, showInfoResult, showDownloadInProgress, showDownloadResult, showError, restoreUiFromState, updateSliderPosition, showFilenameError, clearFilenameError, clearUrlError, showUrlError } from './ui.js';
 import { getInfo, startDownload, connectToJobEvents, cancelJob } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     cacheDOMElements();
-
     initializeThemeSwitcher();
+
     let state = JSON.parse(sessionStorage.getItem('yt-downloader-state')) || {};
+    const youtubeUrlRegex = /^(https?\:\/\/)?(www\.youtube\.com|youtu\.be)\/.+$/;
+    let debounceTimer;
+
+    function validateUrl() {
+        const isValid = youtubeUrlRegex.test(elements.urlInput.value);
+        if (isValid) {
+            clearUrlError();
+        } else {
+            showUrlError();
+        }
+        return isValid;
+    }
+
+    elements.urlInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            validateUrl();
+        }, 250);
+    });
 
     elements.pasteButton.addEventListener('click', async () => {
         try {
-            elements.urlInput.value = await navigator.clipboard.readText();
+            const pastedText = await navigator.clipboard.readText();
+            elements.urlInput.value = pastedText;
+            validateUrl();
         } catch (err) {
             console.error('Failed to read clipboard contents: ', err);
         }
@@ -18,6 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     elements.infoForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+
+        if (!validateUrl()) {
+            return;
+        }
+
         showSubmittingState();
         elements.submitButton.disabled = true;
 

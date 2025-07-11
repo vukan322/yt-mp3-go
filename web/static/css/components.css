@@ -417,3 +417,44 @@ body.dark-theme .filename-input:focus {
     border-color: var(--primary-color);
 }
 
+#submit-button:disabled,
+#submit-button:disabled:hover,
+#submit-button.has-error {
+    background-color: var(--primary-color-light);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+body.dark-theme #submit-button:disabled,
+body.dark-theme #submit-button:disabled:hover,
+body.dark-theme #submit-button.has-error {
+    background-color: var(--border-dark);
+    opacity: 0.6;
+}
+
+.form-error {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-top: 0.8rem;
+    
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all 0.2s ease-in-out;
+    pointer-events: none;
+}
+
+.form-error.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#url-input.has-error {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+}
