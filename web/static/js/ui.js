@@ -26,6 +26,7 @@ export function cacheDOMElements() {
     elements.downloadOptionsArea = document.getElementById('download-options-area');
     elements.filenameInput = document.getElementById('filename-input');
     elements.filenameResetButton = document.getElementById('filename-reset-button');
+    elements.urlError = document.getElementById('url-error');
 
     translations = elements.statusArea.dataset;
     basePath = elements.body.dataset.basePath || '';
@@ -158,4 +159,16 @@ export function clearFilenameError() {
     elements.filenameInput.classList.remove('error');
     elements.errorMessage.classList.remove('visible');
     elements.startDownloadButton.disabled = false;
+}
+
+export function showUrlError() {
+    elements.urlError.classList.add('visible');
+    elements.submitButton.classList.add('has-error');
+    elements.urlInput.classList.add('has-error');
+}
+
+export function clearUrlError() {
+    elements.urlError.classList.remove('visible');
+    elements.submitButton.classList.remove('has-error');
+    elements.urlInput.classList.remove('has-error');
 }

@@ -32,5 +32,6 @@
   "getInfoButton": { "translation": "Start Downloading" },
   "filenameLabel": { "translation": "File name:" },
   "filenameRequired": { "translation": "Please enter a filename." },
-  "resetFilenameTitle": { "translation": "Reset to original title" }
+  "resetFilenameTitle": { "translation": "Reset to original title" },
+  "invalidUrlError": { "translation": "Please enter a valid YouTube URL." }
 }
