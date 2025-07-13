@@ -11,8 +11,9 @@ Built with a robust Go backend and a dynamic, responsive frontend.
 - **Dynamic Frontend:** The UI is built with vanilla JavaScript, using AJAX for form submissions and dynamically updating the page content without requiring a full reload.
 - **Internationalization (i18n):** Fully localized interface supporting both English and Serbian, with language detection and a manual switcher.
 - **Modern UI/UX:** Features a clean, responsive design with light/dark themes, video thumbnail previews, file size display, and state persistence across page reloads using `sessionStorage`.
-- **Audio Quality Control**: Allows users to select from multiple quality presets (Low, Medium, High) to balance file size and audio quality.
-- **Custom Filenames**: Lets users easily edit the MP3 filename in the UI before downloading for better file organization.
+- **Audio Quality Control:** Allows users to select from multiple quality presets (Low, Medium, High) to balance file size and audio quality.
+- **Custom Filenames:** Lets users easily edit the MP3 filename in the UI before downloading for better file organization.
+- **Audio Normalization:** Provides an option to normalize audio to a standard volume level, ensuring a consistent listening experience across different tracks.
 - **Playlist Safe:** Intelligently handles URLs that are part of a playlist, downloading only the single video specified by the user.
 - **No Ads, No Fees:** A clean, user-focused experience with no advertisements or hidden costs.
 
@@ -67,12 +68,22 @@ To run this project locally, you must have the following installed and available
     go mod tidy
     ```
 
-4.  **Run the application:**
+4.  **Make build script executable:**
+    You only need to do this once.
     ```sh
-    go run ./cmd/server/main.go
+    chmod +x build-assets.sh
     ```
 
-5.  **Open in your browser:**
+5.  **Run the application:**
+    ```sh
+    make run
+    ```
+    OR
+    ```sh
+    ./build-assets.sh && go run cmd/server/main.go
+    ```
+
+6.  **Open in your browser:**
     By default, the application will be available at `http://localhost:8080/yt-downloader`.
 
 ## Configuration
