@@ -31,9 +31,10 @@ type AppHandler struct {
 }
 
 type DownloadRequest struct {
-	VideoID  string `json:"videoID"`
-	Quality  string `json:"quality"`
-	Filename string `json:"filename"`
+	VideoID   string `json:"videoID"`
+	Quality   string `json:"quality"`
+	Filename  string `json:"filename"`
+	Normalize bool   `json:"normalize"`
 }
 
 func (h *AppHandler) HandleInfo(w http.ResponseWriter, r *http.Request) {
@@ -96,8 +97,8 @@ func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
 
 	job := h.JobStore.Add(req.VideoID, cancel)
 
-	go h.Downloader.Download(h.JobStore, job.ID, req.VideoID, quality, req.Filename, ctx)
-	slog.Info("created job", "jobID", job.ID, "videoID", req.VideoID, "quality", req.Quality, "filename", req.Filename)
+	go h.Downloader.Download(h.JobStore, job.ID, req.VideoID, quality, req.Filename, ctx, req.Normalize)
+	slog.Info("created job", "jobID", job.ID, "videoID", req.VideoID, "quality", req.Quality, "filename", req.Filename, "normalize", req.Normalize)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"jobID": job.ID})

@@ -27,16 +27,20 @@ export function cacheDOMElements() {
     elements.filenameInput = document.getElementById('filename-input');
     elements.filenameResetButton = document.getElementById('filename-reset-button');
     elements.urlError = document.getElementById('url-error');
+    elements.normalizeSelector = document.getElementById('normalize-selector');
+    elements.normalizeSlider = elements.normalizeSelector.querySelector('.quality-slider');
+    elements.normalizeOptions = document.querySelectorAll('.normalize-option');
+    elements.normalizeDescription = document.getElementById('normalize-description');
 
     translations = elements.statusArea.dataset;
     basePath = elements.body.dataset.basePath || '';
 }
 
-export function updateSliderPosition(targetButton) {
-    if (!targetButton || !elements.qualitySlider) return;
+export function updateSliderPosition(targetButton, sliderElement) {
+    if (!targetButton || !sliderElement) return;
     const { offsetLeft, offsetWidth } = targetButton;
-    elements.qualitySlider.style.left = `${offsetLeft}px`;
-    elements.qualitySlider.style.width = `${offsetWidth}px`;
+    sliderElement.style.left = `${offsetLeft}px`;
+    sliderElement.style.width = `${offsetWidth}px`;
 }
 
 export function resetUi() {
@@ -52,11 +56,13 @@ export function resetUi() {
     elements.statusArea.classList.remove('is-processing');
     elements.filenameInput.classList.remove('error');
     elements.errorMessage.classList.remove('visible');
+    clearUrlError();
 }
 
 export function showSubmittingState() {
     elements.infoForm.style.display = 'none';
     elements.statusArea.style.display = 'block';
+    elements.downloadOptionsArea.style.display = 'none'
     elements.statusText.textContent = translations.submittingText;
     elements.spinner.style.display = 'block';
     elements.statusArea.classList.add('is-processing');
@@ -79,7 +85,13 @@ export function showInfoResult(metadata, state) {
     elements.qualitySelectorArea.style.display = 'block';
     elements.downloadOptionsArea.style.display = 'block';
     elements.startDownloadButton.style.display = 'block';
-    setTimeout(() => updateSliderPosition(document.querySelector('.quality-option.active')), 10);
+
+    setTimeout(() => {
+        const activeQuality = document.querySelector('.quality-option.active');
+        const activeNormalize = document.querySelector('.normalize-option.active');
+        updateSliderPosition(activeQuality, elements.qualitySlider);
+        updateSliderPosition(activeNormalize, elements.normalizeSlider);
+    }, 20);
 }
 
 export function showDownloadInProgress() {

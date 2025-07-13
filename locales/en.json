@@ -33,5 +33,10 @@
   "filenameLabel": { "translation": "File name:" },
   "filenameRequired": { "translation": "Please enter a filename." },
   "resetFilenameTitle": { "translation": "Reset to original title" },
-  "invalidUrlError": { "translation": "Please enter a valid YouTube URL." }
+  "invalidUrlError": { "translation": "Please enter a valid YouTube URL." },
+  "normalizeLabel": { "translation": "Normalize Volume:" },
+  "optionYes": { "translation": "Yes" },
+  "optionNo": { "translation": "No" },
+  "normalizeDescYes": { "translation": "Recommended, ensures consistent volume." },
+  "normalizeDescNo": { "translation": "Original volume, may be loud or quiet." }
 }
