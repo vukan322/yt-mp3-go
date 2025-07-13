@@ -241,5 +241,25 @@ footer a:hover {
         text-align: center;
         gap: 0.5rem;
     }
+    .filename-input-group {
+        position: relative;
+        margin: 0;
+    }
+    .filename-input {
+        width: 95% !important;
+    }
+    #filename-reset-button {
+        position: absolute;
+        top: 55%;
+        right: 5%;
+        transform: translateY(-50%);
+        margin: 0;
+    }
+    .quality-selector {
+        width: 95%;
+    }
+    .option-row {
+        width: 95%;
+    }
 }
 
