@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target) {
             elements.qualityOptions.forEach(opt => opt.classList.remove('active'));
             target.classList.add('active');
-            updateSliderPosition(target);
+            updateSliderPosition(target, elements.qualitySlider);
             state.quality = target.dataset.quality;
             elements.qualityDescription.textContent = target.dataset.desc;
             localStorage.setItem('preferredQuality', state.quality);
@@ -87,10 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         state.filename = filename;
 
+        const activeNormalizeOption = document.querySelector('.normalize-option.active');
+        state.normalize = activeNormalizeOption ? activeNormalizeOption.dataset.value === 'yes' : true;
+
         showDownloadInProgress();
 
         try {
-            const { jobID } = await startDownload(state.videoID, state.quality || 'high', state.filename);
+            const { jobID } = await startDownload(state.videoID, state.quality || 'high', state.filename, state.normalize);
             state.jobID = jobID;
             sessionStorage.setItem('yt-downloader-state', JSON.stringify(state));
 
@@ -106,6 +109,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Download Error:', error);
             showError(error.message);
+        }
+    });
+
+    elements.normalizeSelector.addEventListener('click', (e) => {
+        const target = e.target.closest('.normalize-option');
+        if (target) {
+            elements.normalizeOptions.forEach(opt => opt.classList.remove('active'));
+            target.classList.add('active');
+            updateSliderPosition(target, elements.normalizeSlider);
+            localStorage.setItem('yt-downloader-normalize', target.dataset.value);
+
+            const descSpan = target.querySelector('.description-text');
+            if (descSpan) {
+                elements.normalizeDescription.textContent = descSpan.textContent;
+            }
         }
     });
 
@@ -141,6 +159,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isActive) {
             elements.qualityDescription.textContent = opt.dataset.desc;
             state.quality = preferredQuality;
+        }
+    });
+
+    const savedNormalize = localStorage.getItem('yt-downloader-normalize') || 'yes';
+    elements.normalizeOptions.forEach(opt => {
+        const isActive = opt.dataset.value === savedNormalize;
+        opt.classList.toggle('active', isActive);
+        if (isActive) {
+            const descSpan = opt.querySelector('.description-text');
+            if (descSpan) {
+                elements.normalizeDescription.textContent = descSpan.textContent;
+            }
         }
     });
 

@@ -14,11 +14,11 @@ export async function getInfo(formElement) {
     return await response.json();
 }
 
-export async function startDownload(videoID, quality, filename) {
+export async function startDownload(videoID, quality, filename, normalize) {
     const response = await fetch(`${basePath}/download`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoID, quality, filename }),
+        body: JSON.stringify({ videoID, quality, filename, normalize }),
     });
 
     if (!response.ok) {

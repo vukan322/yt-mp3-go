@@ -67,7 +67,7 @@ func sanitizeFilename(filename string) string {
 	return strings.TrimSpace(sanitized)
 }
 
-func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quality AudioQuality, filename string, ctx context.Context) {
+func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quality AudioQuality, filename string, ctx context.Context, normalize bool) {
 	slog.Info("starting download", "jobID", jobID, "videoID", videoID, "quality", quality)
 	store.UpdateStatus(jobID, jobs.StatusProcessing)
 
@@ -91,6 +91,11 @@ func (d *Downloader) Download(store *jobs.JobStore, jobID, videoID string, quali
 		"--audio-quality", audioQuality, "-o", outputTemplate,
 		"-P", outputDir, videoID,
 	}
+
+	if normalize {
+		baseArgs = append(baseArgs, "--postprocessor-args", "ffmpeg:-filter:a loudnorm")
+	}
+
 	cmd := exec.CommandContext(ctx, "yt-dlp", commandArgs(baseArgs)...)
 
 	stdout, _ := cmd.StdoutPipe()

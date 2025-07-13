@@ -1,6 +1,6 @@
 {
   "appTitle": { "translation": "YouTube Downloader" },
-  "appDescription": { "translation": "Brzo konvertujte i preuzmite YouTube video snimke kao MP3 fajlove." },
+  "appDescription": { "translation": "Brzo konvertujte i preuzmite YouTube videe kao MP3 fajlove." },
   "urlInputPlaceholder": { "translation": "Nalepite YouTube URL ovde..." },
   "downloadButton": { "translation": "Završi Preuzimanje" },
   "pasteButtonTitle": { "translation": "Nalepi iz klipborda" },
@@ -31,7 +31,12 @@
   "qualityHighDesc": { "translation": "Najbolji kvalitet / Preporučeno" },
   "getInfoButton": { "translation": "Započni Preuzimanje" },
   "filenameLabel": { "translation": "Naziv datoteke:" },
-  "filenameRequired": {"translation": "Molimo vas unesite naziv datoteke." },
+  "filenameRequired": { "translation": "Molimo vas unesite naziv datoteke." },
   "resetFilenameTitle": { "translation": "Vrati na originalni naziv" },
-  "invalidUrlError": { "translation": "Molimo unesite ispravan YouTube URL." }
+  "invalidUrlError": { "translation": "Molimo unesite ispravan YouTube URL." },
+  "normalizeLabel": { "translation": "Normalizuj jačinu zvuka:" },
+  "optionYes": { "translation": "Da" },
+  "optionNo": { "translation": "Ne" },
+  "normalizeDescYes": { "translation": "Preporučeno, obezbeđuje ujednačenu jačinu zvuka." },
+  "normalizeDescNo": { "translation": "Originalna jačina, može biti glasno ili tiho." }
 }

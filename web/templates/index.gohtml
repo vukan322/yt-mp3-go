@@ -54,6 +54,26 @@
             </div>
             <p id="quality-description">{{Localize "qualityHighDesc"}}</p>
         </div>
+
+        <hr class="section-separator">
+
+        <div id="normalize-area">
+            <div class="option-row">
+                <p class="section-title" style="padding-bottom: 12px;">{{Localize "normalizeLabel"}}</p>
+                <div id="normalize-selector" class="quality-selector">
+                    <div class="quality-slider"></div>
+                    <button class="normalize-option" data-value="no">
+                        {{Localize "optionNo"}}
+                        <span class="description-text">{{Localize "normalizeDescNo"}}</span>
+                    </button>
+                    <button class="normalize-option active recommended" data-value="yes">
+                        {{Localize "optionYes"}}
+                        <span class="description-text">{{Localize "normalizeDescYes"}}</span>
+                    </button>
+                </div>
+            </div>
+            <p id="normalize-description" class="option-description"></p>
+        </div>
     </div>
 
     <div id="spinner" class="spinner"></div>
