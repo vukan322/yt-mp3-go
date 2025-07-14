@@ -3,7 +3,10 @@
 A modern, feature-rich web application for downloading YouTube videos as high-quality MP3 files.
 Built with a robust Go backend and a dynamic, responsive frontend.
 
-[![YouTube Downloader Screenshot](/screenshots/app-screenshot.png)](https://lukavukanovic.xyz/yt-downloader)
+| Initial Page | Download Options |
+| :---: | :---: |
+| <img src="/screenshots/app-screenshot.png" alt="Initial Page Screenshot" width="450"> | <img src="/screenshots/app-screenshot-options.png" alt="Download Options Screenshot" width="450"> |
+
 ## Key Features
 
 - **Asynchronous Downloads:** Utilizes Go's concurrency with goroutines to process downloads in the background, allowing the server to handle multiple users simultaneously without blocking.
