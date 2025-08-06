@@ -7,8 +7,8 @@
 A modern, feature-rich web application for downloading YouTube videos as MP3 files.
 Built with a robust Go backend and a dynamic, responsive frontend.
 
-| Initial Page | Download Options |
-| :---: | :---: |
+|                                     Initial Page                                      |                                         Download Options                                          |
+|:-------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------:|
 | <img src="/screenshots/app-screenshot.png" alt="Initial Page Screenshot" width="450"> | <img src="/screenshots/app-screenshot-options.png" alt="Download Options Screenshot" width="450"> |
 
 ## Key Features
@@ -54,8 +54,29 @@ To run this project locally, you must have the following installed and available
   ```sh
   sudo apt update && sudo apt install yt-dlp ffmpeg
   ```
+  
+<hr>
 
 ## Getting Started
+
+### Docker (Recommended)
+
+The easiest way to run this application is using Docker. No need to install Go, yt-dlp, or ffmpeg.
+
+```sh
+  git clone https://github.com/vukan322/yt-mp3-go.git
+  cd yt-mp3-go
+  docker-compose up --build
+```
+
+Or manually with Docker:
+```sh
+  docker build -t yt-mp3-downloader .
+  docker run -p 8080:8080 -v ./downloads:/app/downloads -v ./cookies.txt:/app/cookies.txt:ro yt-mp3-downloader
+```
+<hr>
+
+### Local Development
 
 1.  **Clone the repository:**
     ```sh
@@ -90,19 +111,20 @@ To run this project locally, you must have the following installed and available
     ./build-assets.sh && go run cmd/server/main.go
     ```
 
-6.  **Open in your browser:**
-    By default, the application will be available at `http://localhost:8080/yt-downloader`.
+### Access the Application
+
+Open your browser and navigate to `http://localhost:8080/yt-downloader`.
 
 ## Configuration
 
-The application is configured using environment variables, which are loaded from a .env file during local development.
+The application is configured using environment variables, which are loaded from an .env file during local development.
 
-|  Variable                     | Description                                                           |  Default                      |
+| Variable                      | Description                                                           | Default                       |
 |:------------------------------|:----------------------------------------------------------------------|:------------------------------|
-|   **APP_ENV**                 |  The application environment (**development** or **production**).     | **development**               |
-|   **DOMAIN**                  |  The domain the application is running on.                            | **localhost**                 |
-|   **PORT**                    |  The port the application will listen on.                             | **8080**                      |
-|   **BASE_PATH**               |  The URL path prefix for the application.                             | **/yt-downloader**            |
+| **APP_ENV**                   | The application environment (**development** or **production**).      | **development**               |
+| **DOMAIN**                    | The domain the application is running on.                             | **localhost**                 |
+| **PORT**                      | The port the application will listen on.                              | **8080**                      |
+| **BASE_PATH**                 | The URL path prefix for the application.                              | **/yt-downloader**            |
 
 ## Deployment
 
