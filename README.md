@@ -1,5 +1,7 @@
 # YouTube Downloader
 
+
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/vukan322/yt-mp3-go)](https://github.com/vukan322/yt-mp3-go/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Live App](https://img.shields.io/badge/Live_App-Online-brightgreen)](https://lukavukanovic.xyz/yt-downloader/)
 [![Build and Deploy Go App](https://github.com/vukan322/yt-mp3-go/actions/workflows/deploy.yml/badge.svg)](https://github.com/vukan322/yt-mp3-go/actions/workflows/deploy.yml)
