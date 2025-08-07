@@ -62,7 +62,11 @@ func (h *AppHandler) HandleInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(meta)
+	if err := json.NewEncoder(w).Encode(meta); err != nil {
+		slog.Error("Failed to encode video metadata response", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +105,11 @@ func (h *AppHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
 	slog.Info("created job", "jobID", job.ID, "videoID", req.VideoID, "quality", req.Quality, "filename", req.Filename, "normalize", req.Normalize)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"jobID": job.ID})
+	if err := json.NewEncoder(w).Encode(map[string]string{"jobID": job.ID}); err != nil {
+		slog.Error("Failed to encode download response", "error", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *AppHandler) HandleServeDownload(w http.ResponseWriter, r *http.Request) {
@@ -144,7 +152,10 @@ func (h *AppHandler) HandleStatusEvents(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		jobJSON, _ := json.Marshal(job)
-		fmt.Fprintf(w, "data: %s\n\n", jobJSON)
+		if _, err := fmt.Fprintf(w, "data: %s\n\n", jobJSON); err != nil {
+			slog.Error("Failed to write SSE data", "error", err)
+			return
+		}
 		flusher.Flush()
 		if job.Status == jobs.StatusComplete || job.Status == jobs.StatusFailed {
 			return
