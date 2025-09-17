@@ -5,7 +5,7 @@ RUN npm install -g esbuild && \
     esbuild web/static/css/main.css --bundle --minify --outfile=web/static/css/style.css && \
     esbuild web/static/js/main.js --bundle --minify --outfile=web/static/js/bundle.js
 
-FROM golang:1.23-alpine AS build-go
+FROM golang:1.25-alpine AS build-go
 WORKDIR /app
 RUN apk add --no-cache git
 COPY go.mod go.sum ./
