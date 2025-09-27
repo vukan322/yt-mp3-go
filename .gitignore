@@ -27,3 +27,6 @@ cookies.txt
 # Ignore generated build artifacts
 /web/static/css/style.css
 /web/static/js/bundle.js
+
+# Cookies
+yt-cookies.txt
