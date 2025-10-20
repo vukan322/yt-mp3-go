@@ -1,4 +1,4 @@
-FROM node:24-alpine AS build-frontend
+FROM node:25-alpine AS build-frontend
 WORKDIR /app
 COPY web/static ./web/static
 RUN npm install -g esbuild && \
