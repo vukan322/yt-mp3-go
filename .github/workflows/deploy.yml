@@ -80,7 +80,7 @@ jobs:
           strip_components: 1
 
       - name: Deploy new build to server
-        uses: appleboy/ssh-action@v1.2.2
+        uses: appleboy/ssh-action@v1.2.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
