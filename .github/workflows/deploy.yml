@@ -60,7 +60,7 @@ jobs:
           echo "asset_path=$(pwd)/yt-downloader-${{ env.VERSION }}.zip" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Tag and Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.VERSION }}
           name: "Release ${{ env.VERSION }}"
