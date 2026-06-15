@@ -7,5 +7,5 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/lmittmann/tint v1.1.3
 	github.com/nicksnyder/go-i18n/v2 v2.6.1
-	golang.org/x/text v0.36.0
+	golang.org/x/text v0.38.0
 )
